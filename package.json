@@ -2,15 +2,16 @@
 	"name": "redmine-gantt",
 	"version": "0.1.0",
 	"main": "main.js",
-	"devDependencies": {
+	"dependencies": {
 		"electron-prebuilt": "^0.36.1",
-		"react"
-		"react-dom"
-		"babel"
-		"babel-preset-react"
+		"babel-preset-react": "^6.3.13",
+		"babel": "^6.3.13",
+		"react": "^0.14.3",
+		"react-dom": "^0.14.3"
 	},
-
-	"babel" : {
-		"presets": ["react"]
+	"babel": {
+		"presets": [
+			"react"
+		]
 	}
 }
