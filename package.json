@@ -1,17 +1,18 @@
 {
-	"name": "redmine-gantt",
-	"version": "0.1.0",
-	"main": "main.js",
-	"dependencies": {
-		"electron-prebuilt": "^0.36.1",
-		"babel-preset-react": "^6.3.13",
-		"babel": "^6.3.13",
-		"react": "^0.14.3",
-		"react-dom": "^0.14.3"
-	},
-	"babel": {
-		"presets": [
-			"react"
-		]
-	}
+  "name": "redmine-gantt",
+  "version": "0.1.0",
+  "main": "main.js",
+  "dependencies": {
+    "babel": "^6.3.13",
+    "babel-preset-react": "^6.3.13",
+    "babel-register": "^6.3.13",
+    "electron-prebuilt": "^0.36.1",
+    "react": "^0.14.3",
+    "react-dom": "^0.14.3"
+  },
+  "babel": {
+    "presets": [
+      "react"
+    ]
+  }
 }

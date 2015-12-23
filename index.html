@@ -6,14 +6,11 @@
 	</head>
 	<body>
 		<h1>Redmine Gantt</h1>
-		<form name="search">
-			<input type="text" name="searchText"></inout>
-			<input type="button" value="Search" onClick="project.loadList()"></input>
-		</form>
-		<div id="content" />
+		<div id="search"></div>
+		<div id="content"></div>
 		<script>
 			require('babel-register')();
-			var project = require("./js/project.js");
+			require("./js/main/main_view.js");
 		</script>
 	</body>
 </html>
