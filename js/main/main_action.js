@@ -1,9 +1,12 @@
 (function(exports){
 	'use strict';
 
-	const https = require('https');
+	const https = require('http');
 	const dispatcher = require('./main_dispatcher.js');
-	const settings = require("../../settings.json"); // seeting data
+	const ipcRenderer = require('electron').ipcRenderer;
+
+	// get settings data from local file.
+	var settings = JSON.parse(ipcRenderer.sendSync('synchronous-message', 'settings'));
 
 	/**
 	* get Data from Redmine's specific path. If Successed, do callback.
@@ -17,6 +20,7 @@
 			auth : settings.name + ":" + settings.password
 		}, function(res){
 			res.setEncoding('utf8');
+			if (res.statusCode != 200) return;
 			res.on('data', function (data){
 				callback(data);
 			});

@@ -2,15 +2,17 @@
 	'use strict';
 
 	const view = require('./main_view.js');
+	const EventEmitter = require('events').EventEmitter;
 
-	var projects = [];
-	var updated = [];
+	exports.__proto__ = EventEmitter.prototype;
+
+	var _projects = [];
 	exports.setProjects = function(data, target)
 	{
-		projects = [];
+		_projects = [];
 		JSON.parse(data).projects.some(function(project, index){
 			if (project.name.indexOf(target) == -1 &&
-			undefined == projects.find(function(item, i, array){
+			undefined == _projects.find(function(item, i, array){
 				if (project.parent == undefined) return false;
 				if (item.id == project.parent.id) return item;
 				return false;
@@ -19,41 +21,27 @@
 			var proj = {};
 			proj.__proto__ = project;
 			proj.parent_id = (project.parent == undefined) ? 0 : project.parent.id;
-			projects.push(proj);
+			_projects.push(proj);
 		});
 
-		updated.some(function(prop, index){
-			prop();
-		});
+		this.emit('projects');
 	};
 
-	var issues = new Map();
+	var _issues = new Map();
 	exports.setIssues = function(data, project_id)
 	{
-		issues.set(project_id, JSON.parse(data).issues);
-		updated.some(function(prop, index){
-			prop();
-		});
+		_issues.set(project_id, JSON.parse(data).issues);
+		this.emit('issues');
 	};
 
 	exports.Projects = function()
 	{
-		return projects;
+		return _projects;
 	};
 
 	exports.Issues = function(project_id)
 	{
-		return issues.get(project_id);
-	};
-
-	exports.addListner = function(listner)
-	{
-		updated.push(listner);
-	};
-
-	exports.removeListner = function(listner)
-	{
-		updated.pop(listner);
+		return _issues.get(project_id);
 	};
 
 })(this);

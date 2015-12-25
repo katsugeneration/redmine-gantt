@@ -3,6 +3,8 @@
 const electron = require('electron');
 const app = electron.app;  // Module to control application life.
 const BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
+const ipcMain = electron.ipcMain;
+const fs = require('fs');
 
 // Report crashes to our server.
 electron.crashReporter.start();
@@ -29,7 +31,6 @@ app.on('ready', function() {
 	// and load the index.html of the app.
 	mainWindow.loadURL('file://' + __dirname + '/index.html');
 
-
 	// Open the DevTools.
 	mainWindow.webContents.openDevTools();
 
@@ -40,4 +41,15 @@ app.on('ready', function() {
 		// when you should delete the corresponding element.
 		mainWindow = null;
 	});
+});
+
+ipcMain.on('synchronous-message', function(event, arg){
+	var ret = "";
+	if(arg == "settings")
+	{
+		// get settings data
+		ret = fs.readFileSync(__dirname + '/settings.json', 'utf8');
+	}
+
+	event.returnValue = ret;
 });
