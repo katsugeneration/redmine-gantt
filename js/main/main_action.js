@@ -42,10 +42,20 @@
 	};
 
 	/**
+	* load the users related the project whose id is "id".
+	**/
+	exports.loadUsers = function(id)
+	{
+		loadData('/projects/' + id + '/memberships.json', function(data){ dispatcher.usersGetted(data, id); });
+	};
+
+	/**
 	* load the issues registered the project whose id is "id".
 	**/
-	exports.loadIsuues =  function(id)
+	exports.loadIssues =  function(id)
 	{
-		loadData('/issues.json?project_id=' + id, function(data){ dispatcher.issuesGetted(data, id); });
-	}
+		loadData('/issues.json?project_id=' + id, function(data){
+			dispatcher.issuesGetted(data, id);
+		});
+	};
 })(this);

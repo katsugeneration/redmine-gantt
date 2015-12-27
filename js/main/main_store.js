@@ -7,6 +7,9 @@
 	exports.__proto__ = EventEmitter.prototype;
 
 	var _projects = [];
+	var _issues = new Map();
+	var _users = new Map();
+
 	exports.setProjects = function(data, target)
 	{
 		_projects = [];
@@ -27,10 +30,40 @@
 		this.emit('projects');
 	};
 
-	var _issues = new Map();
-	exports.setIssues = function(data, project_id)
+	exports.setUsers = function(data, projectId)
 	{
-		_issues.set(project_id, JSON.parse(data).issues);
+		var usersInProject = [];
+		var memberships = JSON.parse(data).memberships;
+		memberships.some(function(membership, index){
+			if(membership.user != undefined)
+				usersInProject.push(membership.user);
+		});
+
+		_users.set(projectId, usersInProject);
+		this.emit('users');
+	};
+
+	exports.setIssues = function(data, projectId)
+	{
+		_issues.set(projectId, JSON.parse(data).issues);
+		this.emit('issues');
+	};
+
+	exports.updateIssues = function(data, projectId)
+	{
+		var issuesInProject = _issues.get(projectId);
+
+		JSON.parse(data).issues.some(function(updated, index){
+			issuesInProject.some(function(old, index){
+				if(updated.id == old.id)
+				{
+					issuesInProject.push(updated);
+					issuesInProject.pop(old);
+					return true;
+				}
+			});
+		});
+
 		this.emit('issues');
 	};
 
@@ -39,9 +72,14 @@
 		return _projects;
 	};
 
-	exports.Issues = function(project_id)
+	exports.Users = function(projectId)
 	{
-		return _issues.get(project_id);
+		return _users.get(projectId);
+	};
+
+	exports.Issues = function(projectId)
+	{
+		return _issues.get(projectId);
 	};
 
 })(this);

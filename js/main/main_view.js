@@ -118,7 +118,16 @@
 		},
 		render : function()
 		{
-			return( <div><a href='#' onClick={this._onClick}>{this.state.issue.subject}</a></div> );
+			return(
+				<div>
+					<a href='#' onClick={this._onClick}>{this.state.issue.subject}</a>
+					{this.state.issue.priority.name},
+					{this.state.issue.tracker.name},
+					{this.state.issue.start_date},
+					{this.state.issue.due_date},
+					{(this.state.issue.assigned_to == undefined) ? "" : this.state.issue.assigned_to.name}
+				</div>
+			);
 		}
 	});
 
@@ -126,21 +135,32 @@
 		getInitialState: function()
 		{
 			return {
+				projectId : 0,
 				items: []
 			};
 		},
 		componentWillUnmount : function()
 		{
-			store.removeListener('issues', this._onChange);
+			store.removeListener('issues', this._onChangeIssues);
+			store.removeListener('users', this._onChangeUsers);
+		},
+		componentWillMount : function()
+		{
+			this.setState({projectId : this.props.target});
 		},
 		componentDidMount : function()
 		{
-			store.addListener('issues', this._onChange);
-			action.loadIsuues(this.props.target);
+			store.addListener('issues', this._onChangeIssues);
+			store.addListener('users', this._onChangeUsers);
+			action.loadUsers(this.state.projectId);
+			action.loadIssues(this.state.projectId);
 		},
-		_onChange: function()
+		_onChangeUsers : function()
 		{
-		    this.setState({ items: store.Issues(this.props.target) });
+		},
+		_onChangeIssues: function()
+		{
+		    this.setState({ items: store.Issues(this.state.projectId) });
 		},
 		render :function()
 		{
@@ -148,7 +168,7 @@
 
 			var _this = this;
 			var list = this.state.items.map(function(item ,index){
-				return( <li key={item.id + '-' + item.subject}><IssueListRow issue={item}/></li> );
+				return( <li key={item.id + '-' + item.updated_on}><IssueListRow issue={item}/></li> );
 			});
 
 			return ( <ol>{list}</ol> );
