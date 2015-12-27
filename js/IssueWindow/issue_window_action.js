@@ -4,13 +4,15 @@
 	const https = require('http');
 	const ipcRenderer = require('electron').ipcRenderer;
 
+	const mainAction = require('../main/main_action.js');
+
 	// get settings data from local file.
 	var settings = JSON.parse(ipcRenderer.sendSync('synchronous-message', 'settings'));
 
 	/**
 	* get Data from Redmine's specific path. If Successed, do callback.
 	**/
-	var writeData = function(method, path, data)
+	var writeData = function(method, path, data, callback)
 	{
 		var writeData = JSON.stringify(data);
 		var req = https.request({
@@ -24,9 +26,8 @@
 			}
 		}, function(res){
 			res.setEncoding('utf8');
-			res.on('data', function (data){
-				console.log(data);
-			});
+			if (res.statusCode == 200 || res.statusCode == 201)
+				callback();
 		});
 
 		req.write(writeData);
@@ -36,13 +37,13 @@
 		});
 	};
 
-	exports.postNewIssue = function(data)
+	exports.postNewIssue = function(data, projectId)
 	{
-		writeData('POST', '/issues.json', data);
+		writeData('POST', '/issues.json', data, function(){ mainAction.loadIsuues(projectId) } );
 	};
 
-	exports.updateIssue = function(issueId, data)
+	exports.updateIssue = function(issueId, data, projectId)
 	{
-		writeData('PUT', '/issues/' + issueId + '.json', data);
+		writeData('PUT', '/issues/' + issueId + '.json', data, function(){ mainAction.loadIsuues(projectId) } );
 	};
 })(this);

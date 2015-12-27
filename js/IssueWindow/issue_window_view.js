@@ -58,7 +58,6 @@
 		},
 		_addNewIssue : function()
 		{
-			console.log("add new issue");
 			action.postNewIssue({
 				"issue" : {
 					"project_id" : this.state.projectId,
@@ -68,12 +67,11 @@
 					"start_date" : "2015-12-28",
 					"due_date" : "2015-12-29",
 				}
-			});
+			}, this.state.projectId);
 			this._onClose();
 		},
 		_updateIssue : function()
 		{
-			console.log("update issue");
 			action.updateIssue(this.state.object.id, {
 				"issue" : {
 					"subject" : this.state.subject,
@@ -82,7 +80,7 @@
 					"start_date" : "2015-12-28",
 					"due_date" : "2015-12-30",
 				}
-			});
+			}, this.state.projectId);
 			this._onClose();
 		},
 		render :function()

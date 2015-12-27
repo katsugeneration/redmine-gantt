@@ -148,7 +148,7 @@
 
 			var _this = this;
 			var list = this.state.items.map(function(item ,index){
-				return( <li key={item.id}><IssueListRow issue={item}/></li> );
+				return( <li key={item.id + '-' + item.subject}><IssueListRow issue={item}/></li> );
 			});
 
 			return ( <ol>{list}</ol> );
