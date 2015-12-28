@@ -38,15 +38,19 @@
 	exports.loadProjects = function(target)
 	{
 		if (target == "") return;
-		loadData('/projects.json', function(data){ dispatcher.projectsGetted(data, target); });
+		loadData('/projects.json', function(data){
+			dispatcher.projectsGetted(data, target);
+		});
 	};
 
 	/**
-	* load the users related the project whose id is "id".
+	* load the users related with the project whose id is "id".
 	**/
 	exports.loadUsers = function(id)
 	{
-		loadData('/projects/' + id + '/memberships.json', function(data){ dispatcher.usersGetted(data, id); });
+		loadData('/projects/' + id + '/memberships.json', function(data){
+			dispatcher.usersGetted(data, id);
+		});
 	};
 
 	/**
@@ -56,6 +60,16 @@
 	{
 		loadData('/issues.json?project_id=' + id, function(data){
 			dispatcher.issuesGetted(data, id);
+		});
+	};
+
+	/**
+	* load the trackers registered with the Redmine.
+	**/
+	exports.loadTrackers = function()
+	{
+		loadData('/trackers.json', function(data){
+			dispatcher.trackersGetted(data);
 		});
 	};
 })(this);

@@ -82,6 +82,7 @@
 		componentDidMount : function()
 		{
 			store.addListener('projects', this._onChange);
+			action.loadTrackers();
 		},
 		_onChange: function()
 		{
@@ -122,7 +123,7 @@
 				<div>
 					<a href='#' onClick={this._onClick}>{this.state.issue.subject}</a>
 					{this.state.issue.priority.name},
-					{this.state.issue.tracker.name},
+					{store.Tracker().get(this.state.issue.tracker.id).name},
 					{this.state.issue.start_date},
 					{this.state.issue.due_date},
 					{(this.state.issue.assigned_to == undefined) ? "" : this.state.issue.assigned_to.name}

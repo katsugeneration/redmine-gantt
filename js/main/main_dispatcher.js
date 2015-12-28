@@ -22,4 +22,9 @@
 	{
 		store.updateIssues(data, project_id);
 	};
+
+	exports.trackersGetted = function(data)
+	{
+		store.setTrackers(data);
+	}
 })(this);

@@ -9,6 +9,7 @@
 	var _projects = [];
 	var _issues = new Map();
 	var _users = new Map();
+	var _trackers = new Map();
 
 	exports.setProjects = function(data, target)
 	{
@@ -67,6 +68,17 @@
 		this.emit('issues');
 	};
 
+	exports.setTrackers = function(data)
+	{
+		var trackers = JSON.parse(data).trackers;
+
+		trackers.some(function(tracker, index){
+			_trackers.set(tracker.id, tracker);
+		});
+
+		this.emit('trackers');
+	}
+
 	exports.Projects = function()
 	{
 		return _projects;
@@ -80,6 +92,11 @@
 	exports.Issues = function(projectId)
 	{
 		return _issues.get(projectId);
+	};
+
+	exports.Tracker = function()
+	{
+		return _trackers;
 	};
 
 })(this);
