@@ -39,11 +39,11 @@
 
 	exports.postNewIssue = function(data, projectId)
 	{
-		writeData('POST', '/issues.json', data, function(){ mainAction.loadIsuues(projectId) } );
+		writeData('POST', '/issues.json', data, function(){ mainAction.loadIssues(projectId) } );
 	};
 
 	exports.updateIssue = function(issueId, data, projectId)
 	{
-		writeData('PUT', '/issues/' + issueId + '.json', data, function(){ mainAction.loadIsuues(projectId) } );
+		writeData('PUT', '/issues/' + issueId + '.json', data, function(){ mainAction.loadIssues(projectId) } );
 	};
 })(this);

@@ -58,7 +58,7 @@
 	**/
 	exports.loadIssues =  function(id)
 	{
-		loadData('/issues.json?project_id=' + id, function(data){
+		loadData('/issues.json?limit=100&project_id=' + id, function(data){
 			dispatcher.issuesGetted(data, id);
 		});
 	};

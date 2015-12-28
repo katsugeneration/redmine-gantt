@@ -86,15 +86,15 @@
 
 	exports.Users = function(projectId)
 	{
-		return _users.get(projectId);
+		return (_users.get(projectId) == undefined) ? [] : _users.get(projectId);
 	};
 
 	exports.Issues = function(projectId)
 	{
-		return _issues.get(projectId);
+		return (_issues.get(projectId) == undefined) ? [] : _issues.get(projectId);
 	};
 
-	exports.Tracker = function()
+	exports.Trackers = function()
 	{
 		return _trackers;
 	};
