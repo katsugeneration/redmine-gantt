@@ -14,6 +14,7 @@
 	var loadData = function(path, callback)
 	{
 		var _this = this;
+		var data = "";
 		var req = https.request({
 			hostname : settings.host,
 			path : path,
@@ -21,9 +22,12 @@
 		}, function(res){
 			res.setEncoding('utf8');
 			if (res.statusCode != 200) return;
-			res.on('data', function (data){
-				callback(data);
+			res.on('data', function (chunk){
+				data += chunk;
 			});
+			res.on('end', function(){
+				callback(data);
+			})
 		});
 
 		req.end();
