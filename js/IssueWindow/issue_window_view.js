@@ -9,18 +9,34 @@
 	const Issue = require('../Data/issue.js').Issue;
 
 	exports.AddIssueWindow = React.createClass({
+		propTypes : {
+			isOpen : React.PropTypes.bool,
+			type : React.PropTypes.oneOf(['Add', 'Update']).isRequired,
+			relatedObj : React.PropTypes.any.isRequired,
+			onClosed : React.PropTypes.func
+		},
+		getDefaulProps : function()
+		{
+			return {
+				isOpen : false,
+				type : 'Add',
+				relatedObj : {},
+				onClosed : function(){}
+			};
+		},
 		getInitialState: function()
 		{
 			return {
 				isOpen : false,
 				issue : new Issue(),
 				mainButtonLabel : "",
-				mainButtonCallback : function(){},
-				object : {}
+				mainButtonCallback : function(){}
 			};
 		},
-		Open : function(type, object)
+		componentWillReceiveProps : function(nextProps)
 		{
+			var object = nextProps.relatedObj;
+			var type = nextProps.type;
 			var issue = new Issue();
 			var mainButtonLabel = "";
 			var mainButtonCallback = function(){};
@@ -46,11 +62,10 @@
 			}
 
 			this.setState({
-				isOpen : true,
+				isOpen : nextProps.isOpen,
 				issue : issue,
 				mainButtonLabel : mainButtonLabel,
-				mainButtonCallback : mainButtonCallback,
-				object : object
+				mainButtonCallback : mainButtonCallback
 			});
 		},
 		_addNewIssue : function()
@@ -60,12 +75,13 @@
 		},
 		_updateIssue : function()
 		{
-			action.updateIssue(this.state.object.id, this.state.issue.toJSON(), this.state.issue.projectId);
+			action.updateIssue(this.props.relatedObj.id, this.state.issue.toJSON(), this.state.issue.projectId);
 			this._onClose();
 		},
 		_onClose : function()
 		{
 			this.setState({isOpen : false});
+			this.props.onClosed();
 		},
 		_startDateChanged : function(e)
 		{

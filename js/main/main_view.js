@@ -7,6 +7,12 @@
 	const store = require('./main_store.js');
 	const Modal = require('react-modal');
 	const AddIssueWindow = require('../IssueWindow/issue_window_view.js').AddIssueWindow;
+	const GanttChart = require('../Chart/gantt_chart.js').GanttChart;
+	const GanttData = require('../Chart/gantt_chart.js').GanttData;
+
+	var isOpen = false;
+	var modalType = "Add";
+	var modalObj = {};
 
 	var SearchField = React.createClass({
 		getInitialState : function()
@@ -51,7 +57,10 @@
 		},
 		_onClick : function(e)
 		{
-			addNewIssueWindow.Open("Add", this.state.project);
+			isOpen = true;
+			modalType = 'Add';
+			modalObj = this.state.project;
+			main.forceUpdate();
 		},
 		_startUpdate : function()
 		{
@@ -69,6 +78,15 @@
 	});
 
 	var ProjectList =　React.createClass({
+		propTypes : {
+			style : React.PropTypes.object
+		},
+		getDefaulProps : function()
+		{
+			return {
+				style : {}
+			};
+		},
 		getInitialState: function()
 		{
 			return {
@@ -98,7 +116,7 @@
 				}
 			);
 
-			return ( <ul className="projetcs">{list}</ul> );
+			return ( <ul style={Object.assign(this.props.style, {"marginTop" : 0})}>{list}</ul> );
 		}
 	});
 
@@ -115,7 +133,10 @@
 		},
 		_onClick : function(e)
 		{
-			addNewIssueWindow.Open("Update", this.state.issue);
+			isOpen = true;
+			modalType = 'Update';
+			modalObj = this.state.issue;
+			main.forceUpdate();
 		},
 		render : function()
 		{
@@ -168,14 +189,51 @@
 
 			var _this = this;
 			var list = this.state.items.map(function(item ,index){
-				return( <li key={item.id + '-' + item.updated_on}><IssueListRow issue={item}/></li> );
+				return( <li key={item.id + '-' + item.updated_on} ><IssueListRow issue={item}/></li> );
 			});
 
 			return ( <ol>{list}</ol> );
 		}
 	});
 
-	var addNewIssueWindow = reactDOM.render(<AddIssueWindow></AddIssueWindow>, document.getElementById('modal'));
-	reactDOM.render(<SearchField />, document.getElementById('search'));
-	reactDOM.render(<ProjectList />, document.getElementById('content'));
+	var Main = React.createClass({
+		getInitialState : function()
+		{
+			return{
+				items : []
+			};
+		},
+		componentDidMount : function()
+		{
+			store.addListener('issues', this._onIssueChanged);
+		},
+		componentWillUnmount : function()
+		{
+			store.removeListener('issues', this._onIssueChanged);
+		},
+		render : function()
+		{
+			return(
+				<div><SearchField />
+				<ProjectList style={{float: "left"}} />
+				<GanttChart style={{overflow: "scroll"}} data={this.state.items}/>
+				<AddIssueWindow isOpen={isOpen} type={modalType} relatedObj={modalObj} onClosed={this._issueWindowClosed}/></div>
+			);
+		},
+		_onIssueChanged : function()
+		{
+			var data = store.Issues(1).map(function(item, index){
+				var ganttData = new GanttData();
+				ganttData.length = 10;
+				return ganttData;
+			});
+			this.setState({ items : data});
+		},
+		_issueWindowClosed : function()
+		{
+			isOpen = false;
+		}
+	});
+
+	var main = reactDOM.render(<Main />, document.getElementById('content'));
 })(this);
