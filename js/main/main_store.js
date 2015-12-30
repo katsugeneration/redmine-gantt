@@ -46,7 +46,7 @@
 
 	exports.setIssues = function(data, projectId)
 	{
-		_issues.set(projectId, JSON.parse(data).issues);
+		_issues.set(projectId, JSON.parse(data).issues.filter(function(item, index){ if(item.project.id == projectId) return true;}));
 		this.emit('issues');
 	};
 

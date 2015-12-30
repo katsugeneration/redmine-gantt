@@ -17,83 +17,58 @@
 				style : {}
 			};
 		},
-		componentWillReciveProps : function(nextPorps)
-		{
-			console.log('recieve props');
-		},
-		shouldComponentUpdate : function(nextProps, nextState)
-		{
-			var data = nextProps.data.map(function(item, index){ return item.length; });
-
-			var width = 420,
-				barHeight = 24;
-
-			var x = d3.scale.linear()
-				.domain([0, d3.max(data)])
-				.range([0, width]);
-
-			var chart = d3.select(reactDOM.findDOMNode(this)).select("svg")
-				.attr("width", width)
-				.attr("height", barHeight * data.length);
-
-			var bar = chart.selectAll("g")
-				.data(data)
-				.enter().append("g")
-				.attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; });
-
-			bar.append("rect")
-				.attr("width", x)
-				.attr("height", barHeight - 1);
-
-			bar.append("text")
-				.attr("x", function(d) { return x(d) - 3; })
-				.attr("y", barHeight / 2)
-				.attr("dy", ".35em")
-				.text(function(d) { return d; });
-
-			return true;
-		},
-		componentDidMount : function()
-		{
-			var data = this.props.data.map(function(item, index){ return item.length; });
-
-			var width = 420,
-				barHeight = 20;
-
-			var x = d3.scale.linear()
-				.domain([0, d3.max(data)])
-				.range([0, width]);
-
-			var chart = d3.select(reactDOM.findDOMNode(this)).select("svg")
-				.attr("width", width)
-				.attr("height", barHeight * data.length);
-
-			var bar = chart.selectAll("g")
-				.data(data)
-				.enter().append("g")
-				.attr("transform", function(d, i) { return "translate(0," + i * barHeight + ")"; });
-
-			bar.append("rect")
-				.attr("width", x)
-				.attr("height", barHeight - 1);
-
-			bar.append("text")
-				.attr("x", function(d) { return x(d) - 3; })
-				.attr("y", barHeight / 2)
-				.attr("dy", ".35em")
-				.text(function(d) { return d; });
-		},
 		render : function()
 		{
+			var width = 420,
+			barHeight = 24;
+
+			var x = d3.scale.linear()
+			.domain([0, d3.max(this.props.data.map(function(item, index){return (item.dueDate == "Invalid Date") ? 0 : new Date(item.dueDate.getTime() - item.startDate.getTime()).getDate();}))])
+			.range([0, width]);
+
 			return(
-				<div style={this.props.style}><svg></svg></div>
+				<div style={this.props.style}><svg width={width} height={barHeight * this.props.data.length}>
+				{this.props.data.map(function(item, index){
+					var length = (item.dueDate == "Invalid Date") ? 0 : new Date(item.dueDate.getTime() - item.startDate.getTime()).getDate();
+					return <BarChart key={item.key} xScale={x} barHeight={barHeight} barLength={length} index={index}/>
+				})}
+				</svg></div>
+			);
+		}
+	});
+
+	var BarChart = React.createClass({
+		propTypes : {
+			xScale : React.PropTypes.func.isRequired,
+			barHeight : React.PropTypes.number.isRequired,
+			barLength : React.PropTypes.number.isRequired,
+			index : React.PropTypes.number.isRequired
+		},
+		getDefaulProps : function()
+		{
+			return {
+				xScale : function(d){},
+				barHeight : 0,
+				barLength : 0,
+				index : 0
+			};
+		},
+		render :function()
+		{
+			return(
+				<g transform={"translate(0," + this.props.index * this.props.barHeight + ")"}>
+				<rect width={this.props.xScale(this.props.barLength)} height={this.props.barHeight -1} fill="blue"></rect>
+				<text x={this.props.xScale(this.props.barLength) - 10} y={this.props.barHeight / 2} dy=".35em" fill="white">{this.props.barLength}</text>
+				</g>
 			);
 		}
 	});
 
 	function GanttData()
 	{
-		this.length = 0;
+		this.key = "";
+		this.startDate = new Date();
+		this.dueDate = new Date();
 	};
 
 	exports.GanttData = GanttData;

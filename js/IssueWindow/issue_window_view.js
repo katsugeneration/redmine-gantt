@@ -44,8 +44,8 @@
 			if(type == "Add")
 			{
 				issue.projectId = object.id;
-				issue.startDate = new Date(Date.now()).toDateString();
-				issue.dueDate = new Date(Date.now()).toDateString();
+				issue.startDate = new Date(Date.now()).toRedmineFormatStrin();
+				issue.dueDate = new Date(Date.now()).toRedmineFormatStrin();
 				mainButtonLabel = "Create";
 				mainButtonCallback = this._addNewIssue;
 			}
@@ -148,7 +148,7 @@
 		}
 	});
 
-	Date.prototype.toDateString = function()
+	Date.prototype.toRedmineFormatStrin = function()
 	{
 		return this.getFullYear() + "-" + (this.getMonth() + 1) + "-" + this.getDate();
 	};

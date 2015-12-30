@@ -205,11 +205,13 @@
 		},
 		componentDidMount : function()
 		{
-			store.addListener('issues', this._onIssueChanged);
+			store.addListener('projects', this._onDataChanged);
+			store.addListener('issues', this._onDataChanged);
 		},
 		componentWillUnmount : function()
 		{
-			store.removeListener('issues', this._onIssueChanged);
+			store.removeListener('projects', this._onDataChanged);
+			store.removeListener('issues', this._onDataChanged);
 		},
 		render : function()
 		{
@@ -220,13 +222,25 @@
 				<AddIssueWindow isOpen={isOpen} type={modalType} relatedObj={modalObj} onClosed={this._issueWindowClosed}/></div>
 			);
 		},
-		_onIssueChanged : function()
+		_onDataChanged : function()
 		{
-			var data = store.Issues(1).map(function(item, index){
-				var ganttData = new GanttData();
-				ganttData.length = 10;
-				return ganttData;
+			var data = [];
+			store.Projects().some(function(project, index){
+				var projectData = new GanttData();
+				projectData.startDate = new Date(Date.now());
+				projectData.dueDate = new Date(Date.now());
+				projectData.key = project.name;
+				data.push(projectData);
+
+				data = data.concat(store.Issues(project.id).map(function(issue, index){
+					var ganttData = new GanttData();
+					ganttData.startDate = new Date(Date.parse(issue.start_date));
+					ganttData.dueDate = new Date(Date.parse(issue.due_date));
+					ganttData.key = issue.id + "-" + issue.updated_on;
+					return ganttData;
+				}));
 			});
+
 			this.setState({ items : data});
 		},
 		_issueWindowClosed : function()
