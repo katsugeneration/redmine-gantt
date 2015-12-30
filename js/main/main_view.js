@@ -69,7 +69,7 @@
 		render : function()
 		{
 			return(
-				<div>
+				<div {...this.props}>
 					<a href='#' onClick={this._onClick}>{this.state.project.name}</a>
 					<button onClick={this._startUpdate} >update</button>
 				</div>
@@ -111,7 +111,7 @@
 			var _this = this;
 			var list = this.state.items.map(function(item ,index){
 				return( <li key={item.name}>
-					<ProjectListRow project={item}/>
+					<ProjectListRow project={item} style={{"height" : 24}}/>
 					<IssueList target={item.id}/></li> );
 				}
 			);
@@ -143,10 +143,10 @@
 			return(
 				<div>
 					<a href='#' onClick={this._onClick}>{this.state.issue.subject}</a>
-					{store.Trackers().get(this.state.issue.tracker.id).name},
-					{this.state.issue.start_date},
-					{this.state.issue.due_date},
-					{(this.state.issue.assigned_to == undefined) ? "" : this.state.issue.assigned_to.name}
+					{store.Trackers().get(this.state.issue.trackerId).name},
+					{this.state.issue.startDate},
+					{this.state.issue.dueDate},
+					{this.state.issue.assignedUser}
 				</div>
 			);
 		}
@@ -189,7 +189,7 @@
 
 			var _this = this;
 			var list = this.state.items.map(function(item ,index){
-				return( <li key={item.id + '-' + item.updated_on} ><IssueListRow issue={item}/></li> );
+				return( <li key={item.id + '-' + item.updated} ><IssueListRow issue={item}/></li> );
 			});
 
 			return ( <ol>{list}</ol> );
@@ -234,9 +234,9 @@
 
 				data = data.concat(store.Issues(project.id).map(function(issue, index){
 					var ganttData = new GanttData();
-					ganttData.startDate = new Date(Date.parse(issue.start_date));
-					ganttData.dueDate = new Date(Date.parse(issue.due_date));
-					ganttData.key = issue.id + "-" + issue.updated_on;
+					ganttData.startDate = new Date(Date.parse(issue.startDate));
+					ganttData.dueDate = new Date(Date.parse(issue.dueDate));
+					ganttData.key = issue.id + "-" + issue.updated;
 					return ganttData;
 				}));
 			});

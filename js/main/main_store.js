@@ -3,6 +3,7 @@
 
 	const view = require('./main_view.js');
 	const EventEmitter = require('events').EventEmitter;
+	const Issue = require('../Data/issue.js').Issue;
 
 	exports.__proto__ = EventEmitter.prototype;
 
@@ -46,7 +47,11 @@
 
 	exports.setIssues = function(data, projectId)
 	{
-		_issues.set(projectId, JSON.parse(data).issues.filter(function(item, index){ if(item.project.id == projectId) return true;}));
+		_issues.set(projectId, JSON.parse(data).issues.filter(function(item, index){
+			if(item.project.id == projectId) return true;
+		}).map(function(item, index){
+			return Issue.toIssueFromJSON(item);
+		}));
 		this.emit('issues');
 	};
 
@@ -54,7 +59,11 @@
 	{
 		var issuesInProject = _issues.get(projectId);
 
-		JSON.parse(data).issues.some(function(updated, index){
+		JSON.parse(data).issues.filter(function(item, index){
+			 if(item.project.id == projectId) return true;
+		}).map(function(item, index){
+			return Issue.toIssueFromJSON(item);
+		}).some(function(updated, index){
 			issuesInProject.some(function(old, index){
 				if(updated.id == old.id)
 				{

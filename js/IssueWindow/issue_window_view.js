@@ -44,19 +44,14 @@
 			if(type == "Add")
 			{
 				issue.projectId = object.id;
-				issue.startDate = new Date(Date.now()).toRedmineFormatStrin();
-				issue.dueDate = new Date(Date.now()).toRedmineFormatStrin();
+				issue.startDate = new Date(Date.now()).toRedmineFormatString();
+				issue.dueDate = new Date(Date.now()).toRedmineFormatString();
 				mainButtonLabel = "Create";
 				mainButtonCallback = this._addNewIssue;
 			}
 			else if(type == "Update")
 			{
-				issue.projectId = object.project.id;
-				issue.subject = object.subject;
-				issue.trackerId = object.tracker.id;
-				issue.startDate = object.start_date;
-				issue.dueDate = object.due_date;
-				issue.assignedUser = (object.assigned_to == undefined) ? 0 : object.assigned_to.id;
+				issue = object;
 				mainButtonLabel = "Update";
 				mainButtonCallback = this._updateIssue;
 			}
@@ -115,9 +110,9 @@
 			this.state.issue.tarckerid = e.target.value;
 			this.forceUpdate();
 		},
-		_assignedUserChanged : function(e)
+		_assignedIdChanged : function(e)
 		{
-			this.state.issue.assignedUser = e.target.value;
+			this.state.issue.assignedId = e.target.value;
 			this.forceUpdate();
 		},
 		render :function()
@@ -140,7 +135,7 @@
 					<div><label>tracker:<select value={this.state.issue.trackerId} onChange={this._trackerChanged}>{trackerList}</select></label></div>
 					<div><label>start date:<input type="date" max={this.state.issue.dueDate} value={this.state.issue.startDate} required={true} onChange={this._startDateChanged} onBlur={this._startDateBlur}></input></label></div>
 					<div><label>due date:<input type="date" min={this.state.issue.startDate} value={this.state.issue.dueDate} required={true} onChange={this._dueDateChanged} onBlur={this._dueDateBlur}></input></label></div>
-					<div><label>assigned to:<select value={this.state.issue.assignedUser} onChange={this._assignedUserChanged}>{userList}</select></label></div>
+					<div><label>assigned to:<select value={this.state.issue.assignedId} onChange={this._assignedIdChanged}>{userList}</select></label></div>
 					<div><button onClick={this.state.mainButtonCallback}>{this.state.mainButtonLabel}</button>
 					<button onClick={this._onClose}>Cancel</button></div>
 				</Modal>
@@ -148,7 +143,7 @@
 		}
 	});
 
-	Date.prototype.toRedmineFormatStrin = function()
+	Date.prototype.toRedmineFormatString = function()
 	{
 		return this.getFullYear() + "-" + (this.getMonth() + 1) + "-" + this.getDate();
 	};
