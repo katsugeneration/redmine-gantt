@@ -116,7 +116,7 @@
 				}
 			);
 
-			return ( <ul style={Object.assign(this.props.style, {"marginTop" : 0})}>{list}</ul> );
+			return ( <ul style={Object.assign(this.props.style, {"marginTop" : 48})}>{list}</ul> );
 		}
 	});
 
