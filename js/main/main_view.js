@@ -202,6 +202,8 @@
 			return{
 				startDate : new Date(),
 				dueDate : new Date(undefined),
+				chartType : "Date",
+				chartDateWidth : 24,
 				items : []
 			};
 		},
@@ -219,10 +221,21 @@
 		{
 			return(
 				<div><SearchField />
+				<div><select value={this.state.chartType} onChange={this._onchartTypeChanged}><option value="Date">Date</option><option value="Week">Week</option></select></div>
 				<ProjectList style={{float: "left"}} />
-				<GanttChart height={24} width={24} startDate={this.state.startDate} dueDate={this.state.dueDate} style={{overflow: "scroll"}} data={this.state.items}/>
+				<GanttChart height={24} width={this.state.chartDateWidth} type={this.state.chartType} startDate={this.state.startDate} dueDate={this.state.dueDate} style={{overflow: "scroll"}} data={this.state.items}/>
 				<AddIssueWindow isOpen={isOpen} type={modalType} relatedObj={modalObj} onClosed={this._issueWindowClosed}/></div>
 			);
+		},
+		_onchartTypeChanged : function(e)
+		{
+			var width = 24;
+			if (e.target.value == "Week")
+			{
+				width = 7;
+			}
+
+			this.setState({chartType : e.target.value, chartDateWidth : width});
 		},
 		_onDataChanged : function()
 		{
