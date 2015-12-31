@@ -70,8 +70,8 @@
 		{
 			return(
 				<div {...this.props}>
-					<a href='#' onClick={this._onClick}>{this.state.project.name}</a>
-					<button onClick={this._startUpdate} >update</button>
+				<a href='#' onClick={this._onClick}>{this.state.project.name}</a>
+				<button onClick={this._startUpdate} >update</button>
 				</div>
 			);
 		}
@@ -104,7 +104,7 @@
 		},
 		_onChange: function()
 		{
-		    this.setState({ items: store.Projects() });
+			this.setState({ items: store.Projects() });
 		},
 		render : function()
 		{
@@ -142,11 +142,11 @@
 		{
 			return(
 				<div>
-					<a href='#' onClick={this._onClick}>{this.state.issue.subject}</a>
-					{store.Trackers().get(this.state.issue.trackerId).name},
-					{this.state.issue.startDate},
-					{this.state.issue.dueDate},
-					{this.state.issue.assignedUser}
+				<a href='#' onClick={this._onClick}>{this.state.issue.subject}</a>
+				{store.Trackers().get(this.state.issue.trackerId).name},
+				{this.state.issue.startDate},
+				{this.state.issue.dueDate},
+				{this.state.issue.assignedUser}
 				</div>
 			);
 		}
@@ -181,7 +181,7 @@
 		},
 		_onChangeIssues: function()
 		{
-		    this.setState({ items: store.Issues(this.state.projectId) });
+			this.setState({ items: store.Issues(this.state.projectId) });
 		},
 		render :function()
 		{
@@ -200,6 +200,8 @@
 		getInitialState : function()
 		{
 			return{
+				startDate : new Date(),
+				dueDate : new Date(undefined),
 				items : []
 			};
 		},
@@ -218,30 +220,41 @@
 			return(
 				<div><SearchField />
 				<ProjectList style={{float: "left"}} />
-				<GanttChart style={{overflow: "scroll"}} data={this.state.items}/>
+				<GanttChart height={24} width={24} startDate={this.state.startDate} dueDate={this.state.dueDate} style={{overflow: "scroll"}} data={this.state.items}/>
 				<AddIssueWindow isOpen={isOpen} type={modalType} relatedObj={modalObj} onClosed={this._issueWindowClosed}/></div>
 			);
 		},
 		_onDataChanged : function()
 		{
 			var data = [];
+			var startDate = new Date(8640000000000000);
+			var dueDate = new Date(Number.MIN_VALUE);
+
 			store.Projects().some(function(project, index){
 				var projectData = new GanttData();
 				projectData.startDate = new Date(Date.now());
-				projectData.dueDate = new Date(Date.now());
+				projectData.dueDate = new Date(undefined);
 				projectData.key = project.name;
 				data.push(projectData);
+
+				if (startDate > projectData.startDate) startDate = projectData.startDate;
+				if (dueDate < projectData.dueDate) dueDate = projectData.dueDate;
 
 				data = data.concat(store.Issues(project.id).map(function(issue, index){
 					var ganttData = new GanttData();
 					ganttData.startDate = new Date(Date.parse(issue.startDate));
 					ganttData.dueDate = new Date(Date.parse(issue.dueDate));
+
+					if (startDate > ganttData.startDate) startDate = ganttData.startDate;
+					if (dueDate < ganttData.dueDate) dueDate = ganttData.dueDate;
+
 					ganttData.key = issue.id + "-" + issue.updated;
 					return ganttData;
 				}));
 			});
 
-			this.setState({ items : data});
+			if (dueDate < startDate) dueDate = new Date(undefined);
+			this.setState({startDate : startDate, dueDate : dueDate, items : data});
 		},
 		_issueWindowClosed : function()
 		{

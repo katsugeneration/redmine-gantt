@@ -7,37 +7,39 @@
 
 	exports.GanttChart = React.createClass({
 		propTypes : {
+			height : React.PropTypes.number.isRequired,
+			width : React.PropTypes.number.isRequired,
+			startDate : React.PropTypes.instanceOf(Date).isRequired,
+			dueDate : React.PropTypes.instanceOf(Date).isRequired,
 			data : React.PropTypes.arrayOf(React.PropTypes.instanceOf(GanttData)).isRequired,
 			style : React.PropTypes.object
 		},
 		getDefaulProps : function()
 		{
 			return {
+				height : 0,
+				width : 0,
+				startDate : new Date(),
+				dueDate : new Date(),
 				data : [],
 				style : {}
 			};
 		},
 		render : function()
 		{
-			var barWidth = 24,
-			barHeight = 24;
-
-			var startDate = new Date(2015, 12 - 1, 1, 0, 0, 0, 0),
-			dueDate = new Date(2016, 1 - 1, 31, 0, 0, 0, 0);
-
-			var chartWidth = new Date(dueDate.getTime() - startDate.getTime()).totalDate() * barWidth + barWidth;
+			var chartWidth = (this.props.dueDate == "Invalid Date") ? 0 : new Date(this.props.dueDate.getTime() - this.props.startDate.getTime()).totalDate() * this.props.width + this.props.width;
 
 			return(
 				<div style={this.props.style}>
-				<svg width={chartWidth} height={barHeight * (this.props.data.length + 2)}>
-				<MonthBar height={barHeight} width={barHeight} startDate={startDate} dueDate={dueDate}></MonthBar>
-				<DateBar height={barHeight} width={barHeight} startDate={startDate} dueDate={dueDate}></DateBar>
-				<CalendarGrid height={barHeight} width={barHeight} startDate={startDate} dueDate={dueDate} length={this.props.data.length}></CalendarGrid>
+				<svg width={chartWidth} height={this.props.height * (this.props.data.length + 2)}>
+				<MonthBar {...this.props}></MonthBar>
+				<DateBar {...this.props}></DateBar>
+				<CalendarGrid {...this.props} length={this.props.data.length}></CalendarGrid>
 				{this.props.data.map(function(item, index){
 					var length = (item.dueDate == "Invalid Date") ? 0 : new Date(item.dueDate.getTime() - item.startDate.getTime()).totalDate() + 1;
-					var start = new Date(item.startDate.getTime() - startDate.getTime()).totalDate();
-					return <BarChart key={item.key} startPos={start * barWidth} barHeight={barHeight} barWidth={length * barWidth} index={index + 2}/>
-				})}
+					var start = new Date(item.startDate.getTime() - this.props.startDate.getTime()).totalDate();
+					return <BarChart key={item.key} startPos={start * this.props.width} barHeight={this.props.height} barWidth={length * this.props.width} index={index + 2}/>
+				}, this)}
 				</svg>
 				</div>
 			);
@@ -63,12 +65,18 @@
 		render : function()
 		{
 			var monthBlock = [];
-			var monthStartDate = new Date(this.props.startDate.toString());
+			var monthStartDate = this.props.startDate;
 
 			while(this.props.dueDate > monthStartDate)
 			{
 				var nextMonthStartDate = new Date(monthStartDate.toString());
-				nextMonthStartDate.setMonth(monthStartDate.getMonth() + 1);
+				nextMonthStartDate.setMonth(monthStartDate.getMonth() + 1, 1);
+				if (this.props.dueDate <= nextMonthStartDate)
+				{
+					nextMonthStartDate = new Date(this.props.dueDate.toString());
+					nextMonthStartDate.setDate(nextMonthStartDate.getDate() + 1);
+				}
+
 				var start =	new Date(monthStartDate.getTime() - this.props.startDate.getTime()).totalDate();
 				var interval = new Date(nextMonthStartDate.getTime() - monthStartDate.getTime()).totalDate();
 				monthBlock.push(<rect key={"rect-" + monthStartDate} x={this.props.width * start} width={this.props.width * interval} height={this.props.height} fill="white" stroke="black"></rect>)
