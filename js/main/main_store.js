@@ -4,6 +4,7 @@
 	const view = require('./main_view.js');
 	const EventEmitter = require('events').EventEmitter;
 	const Issue = require('../Data/issue.js').Issue;
+	const Colors = require('material-ui').Styles.Colors;
 
 	exports.__proto__ = EventEmitter.prototype;
 
@@ -11,11 +12,12 @@
 	var _issues = new Map();
 	var _users = new Map();
 	var _trackers = new Map();
+	var _colors = [];
 	var _issueWindowState = {
 		isOpen : false,
 		modalType : "Add",
 		modalObject : {}
-	}
+	};
 
 	exports.setProjects = function(data, target)
 	{
@@ -43,7 +45,15 @@
 		var memberships = JSON.parse(data).memberships;
 		memberships.some(function(membership, index){
 			if(membership.user != undefined)
-				usersInProject.push(membership.user);
+			{
+				var user = exports.Users(membership.user.id);
+				if (user == undefined)
+				{
+					user = membership.user;
+					user.color = _getColor();
+				}
+				usersInProject.push(user);
+			}
 		});
 
 		_users.set(projectId, usersInProject);
@@ -106,10 +116,27 @@
 		return _projects;
 	};
 
-	exports.Users = function(projectId)
+	exports.GetProjectUsers = function(projectId)
 	{
 		return (_users.get(projectId) == undefined) ? [] : _users.get(projectId);
 	};
+
+	exports.Users = function(userId)
+	{
+		var ret = undefined;
+
+		_users.forEach(function(users){
+			users.some(function(user ,index){
+				if (user.id == userId)
+				{
+					ret = user;
+					return true;
+				}
+			});
+		});
+
+		return ret;
+	}
 
 	exports.Issues = function(projectId)
 	{
@@ -126,4 +153,28 @@
 		return _issueWindowState;
 	};
 
+	var colorNum = 0;
+	var _getColor = function()
+	{
+		return _colors[colorNum++];
+	};
+
+	(function initColors(){
+		_colors.push(Colors.red500);
+		_colors.push(Colors.indigo500);
+		_colors.push(Colors.teal500);
+		_colors.push(Colors.yellow500);
+		_colors.push(Colors.pink500);
+		_colors.push(Colors.blue500);
+		_colors.push(Colors.green500);
+		_colors.push(Colors.amber500);
+		_colors.push(Colors.purple500);
+		_colors.push(Colors.loghtBlue500);
+		_colors.push(Colors.lightGreen500);
+		_colors.push(Colors.orange500);
+		_colors.push(Colors.deeppurple500);
+		_colors.push(Colors.cyan500);
+		_colors.push(Colors.lime500);
+		_colors.push(Colors.deepOrange);
+	})();
 })(this);

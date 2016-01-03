@@ -46,7 +46,7 @@
 		render : function()
 		{
 			return(
-				<div><SearchField />
+				<div style={{"padding" : 10}}><SearchField />
 				<div><SelectField value={this.state.chartType} onChange={this._onchartTypeChanged} >
 				<MenuItem value="Date" primaryText="Date" />
 				<MenuItem value="Week" primaryText="Week" />
@@ -83,6 +83,8 @@
 					var ganttData = new GanttData();
 					ganttData.startDate = new ExtendsDate(ExtendsDate.parse(issue.startDate));
 					ganttData.dueDate = new ExtendsDate(ExtendsDate.parse(issue.dueDate));
+					if (store.Users(issue.assignedId) != undefined)
+						ganttData.color = store.Users(issue.assignedId).color;
 
 					if (startDate > ganttData.startDate) startDate = ganttData.startDate;
 					if (dueDate < ganttData.dueDate) dueDate = ganttData.dueDate;

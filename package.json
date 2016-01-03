@@ -6,7 +6,6 @@
     "babel": "^6.3.13",
     "babel-preset-react": "^6.3.13",
     "babel-register": "^6.3.13",
-    "d3": "^3.5.12",
     "electron-prebuilt": "^0.36.1",
     "material-ui": "^0.14.0",
     "react": "^0.14.5",

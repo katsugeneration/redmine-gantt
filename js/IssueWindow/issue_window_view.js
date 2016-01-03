@@ -122,7 +122,7 @@
 
 			var userList = [];
 			userList.push( <MenuItem key={0} value={0} primaryText="No Assigned" /> );
-			store.Users(this.state.issue.projectId).some(function(user, index){
+			store.GetProjectUsers(this.state.issue.projectId).some(function(user, index){
 				userList.push( <MenuItem key={user.id} value={user.id} primaryText={user.name} /> );
 			});
 

@@ -4,6 +4,9 @@
 	const React = require('react');
 	const reactDOM = require('react-dom');
 	const ExtendsDate = require('../Extends/extend_date.js').ExtendsDate;
+	const store = require('../main/main_store.js');
+
+	const DEFAULT_BARCHART_COLOR = "#9e9e9e";
 
 	exports.GanttChart = React.createClass({
 		propTypes : {
@@ -47,7 +50,7 @@
 				{this.props.data.map(function(item, index){
 					var length = (item.dueDate == "Invalid Date") ? 0 : new ExtendsDate(item.dueDate.getTime() - item.startDate.getTime()).getTotalDate() + 1;
 					var start = new ExtendsDate(item.startDate.getTime() - startDate.getTime()).getTotalDate();
-					return <BarChart key={item.key} startPos={start * this.props.width} barHeight={this.props.height} barWidth={length * this.props.width} index={index + 2}/>
+					return <BarChart key={item.key} startPos={start * this.props.width} barHeight={this.props.height} barWidth={length * this.props.width} index={index + 2} color={item.color}/>
 				}, this)}
 				</svg>
 				</div>
@@ -104,6 +107,7 @@
 			barHeight : React.PropTypes.number.isRequired,
 			barWidth : React.PropTypes.number.isRequired,
 			startPos : React.PropTypes.number.isRequired,
+			color : React.PropTypes.string,
 			index : React.PropTypes.number.isRequired
 		},
 		getDefaulProps : function()
@@ -111,6 +115,7 @@
 			return {
 				barHeight : 0,
 				barWidth : 0,
+				color : DEFAULT_BARCHART_COLOR,
 				index : 0
 			};
 		},
@@ -118,7 +123,7 @@
 		{
 			return(
 				<g transform={"translate(0," + this.props.index * this.props.barHeight + ")"}>
-				<rect x={this.props.startPos} width={this.props.barWidth} height={this.props.barHeight} fill="#2196F3"></rect>
+				<rect x={this.props.startPos} width={this.props.barWidth} height={this.props.barHeight} fill={this.props.color}></rect>
 				</g>
 			);
 		}
@@ -229,6 +234,7 @@
 		this.key = "";
 		this.startDate = new ExtendsDate();
 		this.dueDate = new ExtendsDate();
+		this.color = DEFAULT_BARCHART_COLOR;
 	};
 
 	exports.GanttData = GanttData;

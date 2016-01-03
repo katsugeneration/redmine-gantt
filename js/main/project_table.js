@@ -114,7 +114,7 @@
 				if (row < store.Issues(project.id).length)
 				{
 					type = "Update";
-					object = store.Issues(project.id)[row];
+					object = store.Issues(project.id)[row - 1];
 					return true;
 				}
 

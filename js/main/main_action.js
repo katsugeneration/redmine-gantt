@@ -1,12 +1,12 @@
 (function(exports){
 	'use strict';
 
-	const https = require('http');
 	const dispatcher = require('./main_dispatcher.js');
 	const ipcRenderer = require('electron').ipcRenderer;
 
 	// get settings data from local file.
 	var settings = JSON.parse(ipcRenderer.sendSync('synchronous-message', 'settings'));
+	const protocol = require(settings.protocol);
 
 	/**
 	* get Data from Redmine's specific path. If Successed, do callback.
@@ -15,7 +15,7 @@
 	{
 		var _this = this;
 		var data = "";
-		var req = https.request({
+		var req = protocol.request({
 			hostname : settings.host,
 			path : path,
 			auth : settings.name + ":" + settings.password
