@@ -2,11 +2,17 @@
 	'use strict';
 
 	const React = require('react');
-	const reactDOM = require('react-dom');
 	const Modal = require('react-modal');
 	const action = require('./issue_window_action.js');
 	const store = require('../main/main_store.js');
 	const Issue = require('../Data/issue.js').Issue;
+	const ExtendsDate = require('../Extends/extend_date.js').ExtendsDate;
+
+	const FlatButton = require('material-ui').FlatButton;
+	const TextField = require('material-ui').TextField;
+	const DatePicker = require('material-ui').DatePicker;
+	const SelectField = require('material-ui').SelectField;
+	const MenuItem = require('material-ui').MenuItem;
 
 	exports.AddIssueWindow = React.createClass({
 		propTypes : {
@@ -29,7 +35,7 @@
 			return {
 				isOpen : false,
 				issue : new Issue(),
-				mainButtonLabel : "",
+				mainButtonLabel : "Add",
 				mainButtonCallback : function(){}
 			};
 		},
@@ -44,8 +50,8 @@
 			if(type == "Add")
 			{
 				issue.projectId = object.id;
-				issue.startDate = new Date(Date.now()).toRedmineFormatString();
-				issue.dueDate = new Date(Date.now()).toRedmineFormatString();
+				issue.startDate = new ExtendsDate(ExtendsDate.now()).toRedmineFormatString();
+				issue.dueDate = new ExtendsDate(ExtendsDate.now()).toRedmineFormatString();
 				mainButtonLabel = "Create";
 				mainButtonCallback = this._addNewIssue;
 			}
@@ -78,26 +84,14 @@
 			this.setState({isOpen : false});
 			this.props.onClosed();
 		},
-		_startDateChanged : function(e)
+		_startDateChanged : function(e, date)
 		{
-			this.state.issue.startDate = e.target.value;
+			this.state.issue.startDate = new ExtendsDate(date).toRedmineFormatString();
 			this.forceUpdate();
 		},
-		_startDateBlur : function(e)
+		_dueDateChanged : function(e, date)
 		{
-			if(!e.target.validity.valid)
-				this.state.issue.startDate = e.target.max;
-			this.forceUpdate();
-		},
-		_dueDateChanged : function(e)
-		{
-			this.state.issue.dueDate = e.target.value;
-			this.forceUpdate();
-		},
-		_dueDateBlur : function(e)
-		{
-			if(!e.target.validity.valid)
-				this.state.issue.dueDate = e.target.min;
+			this.state.issue.dueDate = new ExtendsDate(date).toRedmineFormatString();
 			this.forceUpdate();
 		},
 		_onSubjectChanged: function(e)
@@ -105,46 +99,45 @@
 			this.state.issue.subject = e.target.value;
 			this.forceUpdate();
 		},
-		_trackerChanged : function(e)
+		_trackerChanged : function(e, index, value)
 		{
-			this.state.issue.tarckerid = e.target.value;
+			this.state.issue.trackerId = value;
 			this.forceUpdate();
 		},
-		_assignedIdChanged : function(e)
+		_assignedIdChanged : function(e, index, value)
 		{
-			this.state.issue.assignedId = e.target.value;
+			this.state.issue.assignedId = value;
 			this.forceUpdate();
+		},
+		_formatDate : function(date)
+		{
+			return new ExtendsDate(date).toRedmineFormatString();
 		},
 		render :function()
 		{
 			var trackerList = [];
 			store.Trackers().forEach(function(value, key){
-				trackerList.push( <option key={key} value={key}>{value.name}</option> );
+				trackerList.push( <MenuItem key={key} value={key} primaryText={value.name} /> );
 			});
 
 			var userList = [];
-			userList.push( <option key="0" value="0"></option> );
+			userList.push( <MenuItem key={0} value={0} primaryText="No Assigned" /> );
 			store.Users(this.state.issue.projectId).some(function(user, index){
-				userList.push( <option key={user.id} value={user.id}>{user.name}</option> );
+				userList.push( <MenuItem key={user.id} value={user.id} primaryText={user.name} /> );
 			});
 
 			return (
 				<Modal isOpen={this.state.isOpen} onRequestClose={this._onClose}>
 					<div>{this.state.issue.projectId}</div>
-					<div><input type="text" placeholder="subject" value={this.state.issue.subject} onChange={this._onSubjectChanged}></input></div>
-					<div><label>tracker:<select value={this.state.issue.trackerId} onChange={this._trackerChanged}>{trackerList}</select></label></div>
-					<div><label>start date:<input type="date" max={this.state.issue.dueDate} value={this.state.issue.startDate} required={true} onChange={this._startDateChanged} onBlur={this._startDateBlur}></input></label></div>
-					<div><label>due date:<input type="date" min={this.state.issue.startDate} value={this.state.issue.dueDate} required={true} onChange={this._dueDateChanged} onBlur={this._dueDateBlur}></input></label></div>
-					<div><label>assigned to:<select value={this.state.issue.assignedId} onChange={this._assignedIdChanged}>{userList}</select></label></div>
-					<div><button onClick={this.state.mainButtonCallback}>{this.state.mainButtonLabel}</button>
-					<button onClick={this._onClose}>Cancel</button></div>
+					<div><TextField placeholder="subject" value={this.state.issue.subject} onChange={this._onSubjectChanged} /></div>
+					<div><label>tracker:<SelectField value={this.state.issue.trackerId} onChange={this._trackerChanged}>{trackerList}</SelectField></label></div>
+					<div><label>start date:<DatePicker mode="landscape" formatDate={this._formatDate} maxDate={new Date(this.state.issue.dueDate)} value={new Date(this.state.issue.startDate)} onChange={this._startDateChanged} /></label></div>
+					<div><label>due date:<DatePicker mode="landscape" formatDate={this._formatDate} minDate={new Date(this.state.issue.startDate)} value={new Date(this.state.issue.dueDate)} onChange={this._dueDateChanged} /></label></div>
+					<div><label>assigned to:<SelectField value={this.state.issue.assignedId} onChange={this._assignedIdChanged}>{userList}</SelectField></label></div>
+					<div><FlatButton onClick={this.state.mainButtonCallback} label={this.state.mainButtonLabel} />
+					<FlatButton onClick={this._onClose} label="Cancel" /></div>
 				</Modal>
 		 	);
 		}
 	});
-
-	Date.prototype.toRedmineFormatString = function()
-	{
-		return this.getFullYear() + "-" + (this.getMonth() + 1) + "-" + this.getDate();
-	};
 })(this);

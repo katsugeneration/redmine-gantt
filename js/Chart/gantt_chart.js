@@ -3,14 +3,14 @@
 
 	const React = require('react');
 	const reactDOM = require('react-dom');
-	const d3 = require('d3');
+	const ExtendsDate = require('../Extends/extend_date.js').ExtendsDate;
 
 	exports.GanttChart = React.createClass({
 		propTypes : {
 			height : React.PropTypes.number.isRequired,
 			width : React.PropTypes.number.isRequired,
-			startDate : React.PropTypes.instanceOf(Date).isRequired,
-			dueDate : React.PropTypes.instanceOf(Date).isRequired,
+			startDate : React.PropTypes.instanceOf(ExtendsDate).isRequired,
+			dueDate : React.PropTypes.instanceOf(ExtendsDate).isRequired,
 			type : React.PropTypes.oneOf(['Date', 'Week']).isRequired,
 			data : React.PropTypes.arrayOf(React.PropTypes.instanceOf(GanttData)).isRequired,
 			style : React.PropTypes.object
@@ -20,8 +20,8 @@
 			return {
 				height : 0,
 				width : 0,
-				startDate : new Date(),
-				dueDate : new Date(),
+				startDate : new ExtendsDate(),
+				dueDate : new ExtendsDate(),
 				type : "Date",
 				data : [],
 				style : {}
@@ -29,15 +29,15 @@
 		},
 		render : function()
 		{
-			var startDate = new Date(this.props.startDate.toString());
-			var dueDate = new Date(this.props.dueDate.toString());
+			var startDate = new ExtendsDate(this.props.startDate.toString());
+			var dueDate = new ExtendsDate(this.props.dueDate.toString());
 
 			if (dueDate == "Invalid Date") return(<div style={this.props.style}></div>);
 
 			startDate.setDate(startDate.getDate() - startDate.getDay());
 			dueDate.setDate(dueDate.getDate() + (13 - dueDate.getDay()) % 7);
 
-			var chartWidth = (new Date(dueDate.getTime() - startDate.getTime()).getTotalDate() + 1) * this.props.width + 5;
+			var chartWidth = (new ExtendsDate(dueDate.getTime() - startDate.getTime()).getTotalDate() + 1) * this.props.width + 5;
 
 			return(
 				<div style={this.props.style}>
@@ -45,8 +45,8 @@
 				<MonthBar {...this.props}s startDate={startDate} dueDate={dueDate} ></MonthBar>
 				<CalendarGrid {...this.props} startDate={startDate} dueDate={dueDate} length={this.props.data.length}></CalendarGrid>
 				{this.props.data.map(function(item, index){
-					var length = (item.dueDate == "Invalid Date") ? 0 : new Date(item.dueDate.getTime() - item.startDate.getTime()).getTotalDate() + 1;
-					var start = new Date(item.startDate.getTime() - startDate.getTime()).getTotalDate();
+					var length = (item.dueDate == "Invalid Date") ? 0 : new ExtendsDate(item.dueDate.getTime() - item.startDate.getTime()).getTotalDate() + 1;
+					var start = new ExtendsDate(item.startDate.getTime() - startDate.getTime()).getTotalDate();
 					return <BarChart key={item.key} startPos={start * this.props.width} barHeight={this.props.height} barWidth={length * this.props.width} index={index + 2}/>
 				}, this)}
 				</svg>
@@ -59,16 +59,16 @@
 		propTypes : {
 			height : React.PropTypes.number.isRequired,
 			width : React.PropTypes.number.isRequired,
-			startDate : React.PropTypes.instanceOf(Date).isRequired,
-			dueDate : React.PropTypes.instanceOf(Date).isRequired
+			startDate : React.PropTypes.instanceOf(ExtendsDate).isRequired,
+			dueDate : React.PropTypes.instanceOf(ExtendsDate).isRequired
 		},
 		getDefaulProps : function()
 		{
 			return {
 				height : 0,
 				width : 0,
-				startDate : new Date(),
-				dueDate : new Date()
+				startDate : new ExtendsDate(),
+				dueDate : new ExtendsDate()
 			};
 		},
 		render : function()
@@ -78,16 +78,16 @@
 
 			while(this.props.dueDate > monthStartDate)
 			{
-				var nextMonthStartDate = new Date(monthStartDate.toString());
+				var nextMonthStartDate = new ExtendsDate(monthStartDate.toString());
 				nextMonthStartDate.setMonth(monthStartDate.getMonth() + 1, 1);
 				if (this.props.dueDate <= nextMonthStartDate)
 				{
-					nextMonthStartDate = new Date(this.props.dueDate.toString());
+					nextMonthStartDate = new ExtendsDate(this.props.dueDate.toString());
 					nextMonthStartDate.setDate(nextMonthStartDate.getDate() + 1);
 				}
 
-				var start =	new Date(monthStartDate.getTime() - this.props.startDate.getTime()).getTotalDate();
-				var interval = new Date(nextMonthStartDate.getTime() - monthStartDate.getTime()).getTotalDate();
+				var start =	new ExtendsDate(monthStartDate.getTime() - this.props.startDate.getTime()).getTotalDate();
+				var interval = new ExtendsDate(nextMonthStartDate.getTime() - monthStartDate.getTime()).getTotalDate();
 				monthBlock.push(<rect key={"rect-" + monthStartDate} x={this.props.width * start} width={this.props.width * interval} height={this.props.height} fill="white" stroke="black"></rect>)
 				monthBlock.push(<text key={"text-" + monthStartDate} x={this.props.width * (start + interval / 2)} y={this.props.height - 5} textAnchor="middle" fill="black">{monthStartDate.getMonth() + 1}</text>);
 				monthStartDate = nextMonthStartDate;
@@ -118,7 +118,7 @@
 		{
 			return(
 				<g transform={"translate(0," + this.props.index * this.props.barHeight + ")"}>
-				<rect x={this.props.startPos} width={this.props.barWidth} height={this.props.barHeight} fill="blue"></rect>
+				<rect x={this.props.startPos} width={this.props.barWidth} height={this.props.barHeight} fill="#2196F3"></rect>
 				</g>
 			);
 		}
@@ -128,8 +128,8 @@
 		propTypes : {
 			height : React.PropTypes.number.isRequired,
 			width : React.PropTypes.number.isRequired,
-			startDate : React.PropTypes.instanceOf(Date).isRequired,
-			dueDate : React.PropTypes.instanceOf(Date).isRequired,
+			startDate : React.PropTypes.instanceOf(ExtendsDate).isRequired,
+			dueDate : React.PropTypes.instanceOf(ExtendsDate).isRequired,
 			type : React.PropTypes.oneOf(['Date', 'Week']).isRequired,
 			length : React.PropTypes.number.isRequired
 		},
@@ -138,8 +138,8 @@
 			return {
 				height : 0,
 				width : 0,
-				startDate : new Date(),
-				dueDate : new Date(),
+				startDate : new ExtendsDate(),
+				dueDate : new ExtendsDate(),
 				type : "Date",
 				length : 0
 			};
@@ -163,8 +163,8 @@
 		propTypes : {
 			height : React.PropTypes.number.isRequired,
 			width : React.PropTypes.number.isRequired,
-			startDate : React.PropTypes.instanceOf(Date).isRequired,
-			dueDate : React.PropTypes.instanceOf(Date).isRequired,
+			startDate : React.PropTypes.instanceOf(ExtendsDate).isRequired,
+			dueDate : React.PropTypes.instanceOf(ExtendsDate).isRequired,
 			type : React.PropTypes.oneOf(['Date', 'Week']).isRequired,
 			index : React.PropTypes.number.isRequired
 		},
@@ -173,9 +173,9 @@
 			return {
 				height : 0,
 				width : 0,
-				startDate : new Date(),
-				dueDate : new Date(),
-				type : "Date",
+				startDate : new ExtendsDate(),
+				dueDate : new ExtendsDate(),
+				type : "Week",
 				index : 0
 			};
 		},
@@ -185,12 +185,12 @@
 			var width = 0;
 			if (this.props.type == "Date")
 			{
-				interval = new Date(this.props.dueDate.getTime() - this.props.startDate.getTime()).getTotalDate() + 1;
+				interval = new ExtendsDate(this.props.dueDate.getTime() - this.props.startDate.getTime()).getTotalDate() + 1;
 				width = this.props.width;
 			}
 			else
 			{
-				interval = new Date(this.props.dueDate.getTime() - this.props.startDate.getTime()).getTotalWeek();
+				interval = new ExtendsDate(this.props.dueDate.getTime() - this.props.startDate.getTime()).getTotalWeek();
 				width = this.props.width * 7;
 			}
 
@@ -198,7 +198,7 @@
 
 			for(var i = 0; i < interval ; i++)
 			{
-				var date = new Date(this.props.startDate.toString());
+				var date = new ExtendsDate(this.props.startDate.toString());
 
 				if (this.props.type == "Date")
 				{
@@ -227,28 +227,9 @@
 	function GanttData()
 	{
 		this.key = "";
-		this.startDate = new Date();
-		this.dueDate = new Date();
+		this.startDate = new ExtendsDate();
+		this.dueDate = new ExtendsDate();
 	};
-
-	Date.prototype.getTotalDate = function()
-	{
-		return Math.ceil(this.getTime() / (24 * 60 * 60 * 1000));
-	}
-
-	Date.prototype.getTotalWeek = function()
-	{
-		return Math.ceil(this.getTime() / (7 * 24 * 60 * 60 * 1000));
-	}
-
-	Date.prototype.getWeek = function()
-	{
-		var firstDay = new Date(this.toString());
-		firstDay.setMonth(0, 1);
-		firstDay.setDate((7 - firstDay.getDay()) % 7 + 1);
-
-		return (new Date(this.getTime() - firstDay.getTime()).getTotalWeek() + 1);
-	}
 
 	exports.GanttData = GanttData;
 })(this);

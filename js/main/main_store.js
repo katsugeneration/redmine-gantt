@@ -11,6 +11,11 @@
 	var _issues = new Map();
 	var _users = new Map();
 	var _trackers = new Map();
+	var _issueWindowState = {
+		isOpen : false,
+		modalType : "Add",
+		modalObject : {}
+	}
 
 	exports.setProjects = function(data, target)
 	{
@@ -86,6 +91,14 @@
 		});
 
 		this.emit('trackers');
+	};
+
+	exports.setIssueWindowState = function(isOpen, modalType, modalObject)
+	{
+		_issueWindowState.isOpen = isOpen;
+		_issueWindowState.modalType = modalType;
+		_issueWindowState.modalObject = modalObject;
+		this.emit('issue-window-state');
 	}
 
 	exports.Projects = function()
@@ -106,6 +119,11 @@
 	exports.Trackers = function()
 	{
 		return _trackers;
+	};
+
+	exports.issueWindowState = function()
+	{
+		return _issueWindowState;
 	};
 
 })(this);

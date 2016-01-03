@@ -76,4 +76,9 @@
 			dispatcher.trackersGetted(data);
 		});
 	};
+
+	exports.updateIssueWindowState = function(isOpen, modalType, modalObject)
+	{
+		dispatcher.issueWindowStateUpdated(isOpen, modalType, modalObject);
+	};
 })(this);

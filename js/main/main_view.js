@@ -5,258 +5,84 @@
 	const reactDOM = require('react-dom');
 	const action = require('./main_action.js');
 	const store = require('./main_store.js');
-	const Modal = require('react-modal');
+
+	const SearchField = require('./search_field.js').SearchField;
 	const AddIssueWindow = require('../IssueWindow/issue_window_view.js').AddIssueWindow;
 	const GanttChart = require('../Chart/gantt_chart.js').GanttChart;
+	const ProjectList = require('./project_table.js').ProjectList;
+
 	const GanttData = require('../Chart/gantt_chart.js').GanttData;
+	const ExtendsDate = require('../Extends/extend_date.js').ExtendsDate;
 
-	var isOpen = false;
-	var modalType = "Add";
-	var modalObj = {};
-
-	var SearchField = React.createClass({
-		getInitialState : function()
-		{
-			return {
-				textValue: ""
-			};
-		},
-		_textChanged : function(e)
-		{
-			this.setState({textValue : e.target.value});
-		},
-		_startSearch : function(e)
-		{
-			action.loadProjects(this.state.textValue);
-		},
-		_keyPressed : function(e)
-		{
-			if (e.which == 13) action.loadProjects(this.state.textValue);
-		},
-		render : function()
-		{
-			return (
-				<div>
-				<input type="text" placeholder="Project Name" value={this.state.textValue} onChange={this._textChanged} onKeyPress={this._keyPressed}/>
-				<button onClick={this._startSearch} >search</button>
-				</div>
-			);
-		}
-	});
-
-	var ProjectListRow = React.createClass({
-		getInitialState: function()
-		{
-			return {
-				project : {}
-			};
-		},
-		componentWillMount : function()
-		{
-			this.setState({project : this.props.project});
-		},
-		_onClick : function(e)
-		{
-			isOpen = true;
-			modalType = 'Add';
-			modalObj = this.state.project;
-			main.forceUpdate();
-		},
-		_startUpdate : function()
-		{
-			action.loadIssues(this.state.project.id);
-		},
-		render : function()
-		{
-			return(
-				<div {...this.props}>
-				<a href='#' onClick={this._onClick}>{this.state.project.name}</a>
-				<button onClick={this._startUpdate} >update</button>
-				</div>
-			);
-		}
-	});
-
-	var ProjectList =　React.createClass({
-		propTypes : {
-			style : React.PropTypes.object
-		},
-		getDefaulProps : function()
-		{
-			return {
-				style : {}
-			};
-		},
-		getInitialState: function()
-		{
-			return {
-				items : []
-			};
-		},
-		componentWillUnmount : function()
-		{
-			store.removeListener('projects', this._onChange);
-		},
-		componentDidMount : function()
-		{
-			store.addListener('projects', this._onChange);
-			action.loadTrackers();
-		},
-		_onChange: function()
-		{
-			this.setState({ items: store.Projects() });
-		},
-		render : function()
-		{
-			var _this = this;
-			var list = this.state.items.map(function(item ,index){
-				return( <li key={item.name}>
-					<ProjectListRow project={item} style={{"height" : 24}}/>
-					<IssueList target={item.id}/></li> );
-				}
-			);
-
-			return ( <ul style={Object.assign(this.props.style, {"marginTop" : 48})}>{list}</ul> );
-		}
-	});
-
-	var IssueListRow = React.createClass({
-		getInitialState: function()
-		{
-			return {
-				issue : {}
-			};
-		},
-		componentWillMount : function()
-		{
-			this.setState({issue : this.props.issue});
-		},
-		_onClick : function(e)
-		{
-			isOpen = true;
-			modalType = 'Update';
-			modalObj = this.state.issue;
-			main.forceUpdate();
-		},
-		render : function()
-		{
-			return(
-				<div>
-				<a href='#' onClick={this._onClick}>{this.state.issue.subject}</a>
-				{store.Trackers().get(this.state.issue.trackerId).name},
-				{this.state.issue.startDate},
-				{this.state.issue.dueDate},
-				{this.state.issue.assignedUser}
-				</div>
-			);
-		}
-	});
-
-	var IssueList = React.createClass({
-		getInitialState: function()
-		{
-			return {
-				projectId : 0,
-				items: []
-			};
-		},
-		componentWillUnmount : function()
-		{
-			store.removeListener('issues', this._onChangeIssues);
-			store.removeListener('users', this._onChangeUsers);
-		},
-		componentWillMount : function()
-		{
-			this.setState({projectId : this.props.target});
-		},
-		componentDidMount : function()
-		{
-			store.addListener('issues', this._onChangeIssues);
-			store.addListener('users', this._onChangeUsers);
-			action.loadUsers(this.state.projectId);
-			action.loadIssues(this.state.projectId);
-		},
-		_onChangeUsers : function()
-		{
-		},
-		_onChangeIssues: function()
-		{
-			this.setState({ items: store.Issues(this.state.projectId) });
-		},
-		render :function()
-		{
-			if (this.state.items == undefined) return (<ol></ol>);
-
-			var _this = this;
-			var list = this.state.items.map(function(item ,index){
-				return( <li key={item.id + '-' + item.updated} ><IssueListRow issue={item}/></li> );
-			});
-
-			return ( <ol>{list}</ol> );
-		}
-	});
+	const SelectField = require('material-ui').SelectField;
+	const MenuItem = require('material-ui').MenuItem;
 
 	var Main = React.createClass({
 		getInitialState : function()
 		{
 			return{
-				startDate : new Date(),
-				dueDate : new Date(undefined),
-				chartType : "Date",
-				chartDateWidth : 24,
-				items : []
+				startDate : new ExtendsDate(),
+				dueDate : new ExtendsDate(undefined),
+				chartType : "Week",
+				chartDateWidth : 10,
+				items : [],
+				isOpen : false,
+				modalType : "Add",
+				modalObject : {}
 			};
 		},
 		componentDidMount : function()
 		{
 			store.addListener('projects', this._onDataChanged);
 			store.addListener('issues', this._onDataChanged);
+			store.addListener('issue-window-state', this._onIssueWindowStateChanged);
 		},
 		componentWillUnmount : function()
 		{
 			store.removeListener('projects', this._onDataChanged);
 			store.removeListener('issues', this._onDataChanged);
+			store.removeListener('issue-window-state', this._onIssueWindowStateChanged);
 		},
 		render : function()
 		{
 			return(
 				<div><SearchField />
-				<div><select value={this.state.chartType} onChange={this._onchartTypeChanged}><option value="Date">Date</option><option value="Week">Week</option></select></div>
+				<div><SelectField value={this.state.chartType} onChange={this._onchartTypeChanged} >
+				<MenuItem value="Date" primaryText="Date" />
+				<MenuItem value="Week" primaryText="Week" />
+				</SelectField></div>
 				<ProjectList style={{float: "left"}} />
-				<GanttChart height={24} width={this.state.chartDateWidth} type={this.state.chartType} startDate={this.state.startDate} dueDate={this.state.dueDate} style={{overflow: "scroll"}} data={this.state.items}/>
-				<AddIssueWindow isOpen={isOpen} type={modalType} relatedObj={modalObj} onClosed={this._issueWindowClosed}/></div>
+				<GanttChart height={51} width={this.state.chartDateWidth} type={this.state.chartType} startDate={this.state.startDate} dueDate={this.state.dueDate} style={{overflow: "scroll"}} data={this.state.items}/>
+				<AddIssueWindow isOpen={this.state.isOpen} type={this.state.modalType} relatedObj={this.state.modalObject} onClosed={this._issueWindowClosed}/></div>
 			);
 		},
-		_onchartTypeChanged : function(e)
+		_onchartTypeChanged : function(event, index, value)
 		{
-			var width = 24;
-			if (e.target.value == "Week")
+			var width = 51;
+			if (value == "Week")
 			{
-				width = 7;
+				width = 10;
 			}
 
-			this.setState({chartType : e.target.value, chartDateWidth : width});
+			this.setState({chartType : value, chartDateWidth : width});
 		},
 		_onDataChanged : function()
 		{
 			var data = [];
-			var startDate = new Date(8640000000000000);
-			var dueDate = new Date(Number.MIN_VALUE);
+			var startDate = new ExtendsDate(8640000000000000);
+			var dueDate = new ExtendsDate(Number.MIN_VALUE);
 
 			store.Projects().some(function(project, index){
 				var projectData = new GanttData();
-				projectData.startDate = new Date(Date.now());
-				projectData.dueDate = new Date(undefined);
+				projectData.startDate = new ExtendsDate(ExtendsDate.now());
+				projectData.dueDate = new ExtendsDate(undefined);
 				projectData.key = project.name;
 				data.push(projectData);
 
-				if (startDate > projectData.startDate) startDate = projectData.startDate;
-				if (dueDate < projectData.dueDate) dueDate = projectData.dueDate;
-
 				data = data.concat(store.Issues(project.id).map(function(issue, index){
 					var ganttData = new GanttData();
-					ganttData.startDate = new Date(Date.parse(issue.startDate));
-					ganttData.dueDate = new Date(Date.parse(issue.dueDate));
+					ganttData.startDate = new ExtendsDate(ExtendsDate.parse(issue.startDate));
+					ganttData.dueDate = new ExtendsDate(ExtendsDate.parse(issue.dueDate));
 
 					if (startDate > ganttData.startDate) startDate = ganttData.startDate;
 					if (dueDate < ganttData.dueDate) dueDate = ganttData.dueDate;
@@ -266,14 +92,19 @@
 				}));
 			});
 
-			if (dueDate < startDate) dueDate = new Date(undefined);
+			if (dueDate < startDate) dueDate = new ExtendsDate(undefined);
 			this.setState({startDate : startDate, dueDate : dueDate, items : data});
+		},
+		_onIssueWindowStateChanged : function()
+		{
+			var state = store.issueWindowState();
+			this.setState({ isOpen : state.isOpen, modalType : state.modalType, modalObject : state.modalObject });
 		},
 		_issueWindowClosed : function()
 		{
-			isOpen = false;
+			this.setState({ isOpen : false });
 		}
 	});
 
-	var main = reactDOM.render(<Main />, document.getElementById('content'));
+	reactDOM.render(<Main />, document.getElementById('content'));
 })(this);

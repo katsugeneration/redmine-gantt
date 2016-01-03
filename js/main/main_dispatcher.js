@@ -26,5 +26,10 @@
 	exports.trackersGetted = function(data)
 	{
 		store.setTrackers(data);
+	};
+
+	exports.issueWindowStateUpdated = function(isOpen, modalType, modalObject)
+	{
+		store.setIssueWindowState(isOpen, modalType, modalObject);
 	}
 })(this);
