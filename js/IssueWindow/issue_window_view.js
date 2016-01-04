@@ -127,8 +127,7 @@
 			});
 
 			return (
-				<Modal isOpen={this.state.isOpen} onRequestClose={this._onClose}>
-					<div>{this.state.issue.projectId}</div>
+				<Modal isOpen={this.state.isOpen} onRequestClose={this._onClose} style={{"content" : {"position" : "absolute", "left": 300, "right" : 300}}}>
 					<div><TextField placeholder="subject" value={this.state.issue.subject} onChange={this._onSubjectChanged} /></div>
 					<div><label>tracker:<SelectField value={this.state.issue.trackerId} onChange={this._trackerChanged}>{trackerList}</SelectField></label></div>
 					<div><label>start date:<DatePicker mode="landscape" formatDate={this._formatDate} maxDate={new Date(this.state.issue.dueDate)} value={new Date(this.state.issue.startDate)} onChange={this._startDateChanged} /></label></div>

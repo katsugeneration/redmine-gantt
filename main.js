@@ -5,6 +5,7 @@ const app = electron.app;  // Module to control application life.
 const BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
 const ipcMain = electron.ipcMain;
 const fs = require('fs');
+var dialog = require('dialog');
 
 // Report crashes to our server.
 electron.crashReporter.start();
@@ -44,8 +45,15 @@ ipcMain.on('synchronous-message', function(event, arg){
 	var ret = "";
 	if(arg == "settings")
 	{
-		// get settings data
-		ret = fs.readFileSync(__dirname + '/settings.json', 'utf8');
+		try {
+			// get settings data
+			ret = fs.readFileSync(__dirname + '/settings.json', 'utf8');
+		} catch (e) {
+			dialog.showErrorBox("Redmine Gantt", e.message);
+			app.quit();
+		} finally {
+
+		}
 	}
 
 	event.returnValue = ret;
