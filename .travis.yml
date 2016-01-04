@@ -1,0 +1,8 @@
+language : node_js
+node_js:
+  - "5.3.0"
+
+install:
+  - npm install
+before_script:
+  - gulp babel

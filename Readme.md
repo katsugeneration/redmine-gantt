@@ -1,14 +1,15 @@
 # Read me
+[![Build Status](https://travis-ci.org/katsugeneration/redmine-gantt.svg)](https://travis-ci.org/katsugeneration/redmine-gantt)
 [![Dependency Status](https://gemnasium.com/katsugeneration/redmine-gantt.svg)](https://gemnasium.com/katsugeneration/redmine-gantt)
 
 ## Usage
-you want to use redmine-gantt, you should act under command.
+if you want to use redmine-gantt, you should act follow command.
 
 ```
 git clone  https://github.com/katsugeneration/redmine-gantt.git
 cd redmine-gantt
 npm install
-touch settings.json
+gulp babel
 ```
 
 before you use redmine-gantt, you make settings.json that written Redmine access information.
@@ -25,5 +26,5 @@ before you use redmine-gantt, you make settings.json that written Redmine access
 finally, you run start command.
 
 ```
-npm run start
+npm start
 ```
