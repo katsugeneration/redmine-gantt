@@ -1,6 +1,7 @@
-# Read me
 [![Build Status](https://travis-ci.org/katsugeneration/redmine-gantt.svg)](https://travis-ci.org/katsugeneration/redmine-gantt)
 [![Dependency Status](https://gemnasium.com/katsugeneration/redmine-gantt.svg)](https://gemnasium.com/katsugeneration/redmine-gantt)
+[![Code Climate](https://codeclimate.com/github/katsugeneration/redmine-gantt/badges/gpa.svg)](https://codeclimate.com/github/katsugeneration/redmine-gantt)
+[![Test Coverage](https://codeclimate.com/github/katsugeneration/redmine-gantt/badges/coverage.svg)](https://codeclimate.com/github/katsugeneration/redmine-gantt/coverage)
 
 ## Usage
 if you want to use redmine-gantt, you should act follow command.
@@ -28,3 +29,6 @@ finally, you run start command.
 ```
 npm start
 ```
+
+## License
+MIT

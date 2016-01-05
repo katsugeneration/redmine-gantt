@@ -4,17 +4,18 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-	"test" : "exit 0"
+    "test": "gulp test"
   },
-  "repository" : {
-	  "type" : "git",
-	  "url" : "https://github.com/katsugeneration/redmine-gantt.git"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/katsugeneration/redmine-gantt.git"
   },
-  "keywords" : [
-	  "Redmine",
-	  "GanttChart"
+  "license": "MIT",
+  "keywords": [
+    "Redmine",
+    "GanttChart"
   ],
-  "author" : "Katsuya Shimabukuro",
+  "author": "Katsuya Shimabukuro",
   "dependencies": {
     "electron-prebuilt": "^0.36.2",
     "material-ui": "^0.14.0",
@@ -24,8 +25,11 @@
     "react-tap-event-plugin": "^0.2.1"
   },
   "devDependencies": {
+    "babel-preset-react": "^6.3.13",
     "gulp": "^3.9.0",
     "gulp-babel": "^6.1.1",
-    "babel-preset-react": "^6.3.13"
+    "gulp-mocha": "^2.2.0",
+    "mocha": "^2.3.4",
+    "sinon": "^1.17.2"
   }
 }

@@ -1,7 +1,6 @@
 (function(exports){
 	'use strict';
 
-	const view = require('./main_view.js');
 	const EventEmitter = require('events').EventEmitter;
 	const Issue = require('../Data/issue.js').Issue;
 	const Colors = require('material-ui').Styles.Colors;
