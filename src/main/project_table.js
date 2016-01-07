@@ -131,12 +131,17 @@
 		{
 			action.updateIssueWindowState(true, this.state.buttonType, this.state.buttonRelatedObject);
 		},
+		_onDeleteButtonClick : function()
+		{
+			action.deleteIssue(this.state.buttonRelatedObject);
+		},
 		render : function()
 		{
 			return (
 				<div style={Object.assign(this.props.style, {"width": 500, "paddingTop" : 8})}>
 				<FlatButton onClick={this._onButtonClick} disabled={this.state.buttonType != "Add"} label="Add" />
 				<FlatButton onClick={this._onButtonClick} disabled={this.state.buttonType != "Update"} label="Update" />
+				<FlatButton onClick={this._onDeleteButtonClick} disabled={this.state.buttonType == "None"} label="Delete" />
 				<Table selectable={true} onRowSelection={this._onRowSelection}>
 					<TableHeader>
 						<TableRow>

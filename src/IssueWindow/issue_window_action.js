@@ -6,7 +6,7 @@
 	const mainAction = require('../main/main_action.js');
 
 	// get settings data from local file.
-	var settings = JSON.parse(ipcRenderer.sendSync('synchronous-message', 'settings'));
+	var settings = JSON.parse(ipcRenderer.sendSync('settings', 'settings'));
 	const protocol = require(settings.protocol);
 
 	/**

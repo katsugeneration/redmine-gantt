@@ -5,7 +5,7 @@
 	const ipcRenderer = require('electron').ipcRenderer;
 
 	// get settings data from local file.
-	var settings = JSON.parse(ipcRenderer.sendSync('synchronous-message', 'settings'));
+	var settings = JSON.parse(ipcRenderer.sendSync('settings'));
 	const protocol = require(settings.protocol);
 
 	/**
@@ -34,7 +34,31 @@
 		req.on('error', function(e) {
 			console.error(e);
 		});
-	};
+	}
+
+	/**
+	* delete data method from Redmine.
+	**/
+	var deleteData = function(path, callback)
+	{
+		var _this = this;
+		var data = "";
+		var req = protocol.request({
+			hostname : settings.host,
+			path : path,
+			method : 'DELETE',
+			auth : settings.name + ":" + settings.password
+		}, function(res){
+			res.setEncoding('utf8');
+			if (res.statusCode != 200) return;
+			callback();
+		});
+
+		req.end();
+		req.on('error', function(e) {
+			console.error(e);
+		});
+	}
 
 	/**
 	* load the projects whose name contains "target" from Redmine.
@@ -45,7 +69,7 @@
 		loadData('/projects.json', function(data){
 			dispatcher.projectsGetted(data, target);
 		});
-	};
+	}
 
 	/**
 	* load the users related with the project whose id is "id".
@@ -55,7 +79,7 @@
 		loadData('/projects/' + id + '/memberships.json', function(data){
 			dispatcher.usersGetted(data, id);
 		});
-	};
+	}
 
 	/**
 	* load the issues registered the project whose id is "id".
@@ -65,7 +89,15 @@
 		loadData('/issues.json?limit=100&project_id=' + id, function(data){
 			dispatcher.issuesGetted(data, id);
 		});
-	};
+	}
+
+	exports.deleteIssue = function(issue)
+	{
+		var _this = this;
+		deleteData('/issues/' + issue.id + '.json', function(){
+			_this.loadIssues(issue.projectId);
+		});
+	}
 
 	/**
 	* load the trackers registered with the Redmine.
@@ -75,10 +107,10 @@
 		loadData('/trackers.json', function(data){
 			dispatcher.trackersGetted(data);
 		});
-	};
+	}
 
 	exports.updateIssueWindowState = function(isOpen, modalType, modalObject)
 	{
 		dispatcher.issueWindowStateUpdated(isOpen, modalType, modalObject);
-	};
+	}
 })(this);

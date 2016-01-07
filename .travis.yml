@@ -4,6 +4,11 @@ node_js:
 
 install:
   - npm install
+  - export DISPLAY=':99.0'
+  - Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+cache:
+  directories:
+    - node_modules
 
 before_script:
   - gulp babel
@@ -14,6 +19,9 @@ after_script:
 addons:
   code_climate:
     repo_token: e6733e59bd2565d94593967366559d0a0984bfb329fd3890afc2e6c1ce12c5f0
+  apt:
+    packages:
+      - xvfb
 
 notifications:
   email: false

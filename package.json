@@ -4,7 +4,8 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "test": "gulp test"
+    "test": "gulp test",
+    "build": "gulp babel"
   },
   "repository": {
     "type": "git",
@@ -28,7 +29,6 @@
     "babel-preset-react": "^6.3.13",
     "gulp": "^3.9.0",
     "gulp-babel": "^6.1.1",
-    "gulp-mocha": "^2.2.0",
     "mocha": "^2.3.4",
     "sinon": "^1.17.2"
   }

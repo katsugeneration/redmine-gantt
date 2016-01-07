@@ -1,0 +1,6 @@
+{
+	"name" : "name",
+	"password" : "password",
+	"host" : "host",
+	"protocol" : "http"
+}

@@ -1,6 +1,5 @@
 var gulp = require("gulp");
 var babel = require("gulp-babel");
-var mocha = require('gulp-mocha');
 
 gulp.task('babel', function() {
 	gulp.src('./src/**/*.js')
@@ -13,8 +12,15 @@ gulp.task('watch', function() {
 });
 
 gulp.task('test', function() {
-	gulp.src('./test/**/*.js')
-		.pipe(mocha({reporter:'list'}))
+	var electron = require('electron-prebuilt');
+	var child_process = require('child_process');
+
+	var finished = child_process.spawnSync(
+		electron,
+        ['test'],
+        {stdio: 'inherit'}
+    );
+	process.exit(finished.status);
 });
 
 gulp.task('default', ['babel', 'watch']);
