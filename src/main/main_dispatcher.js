@@ -3,6 +3,16 @@
 
 	const store = require('./main_store.js');
 
+	exports.dataLoadStarted = function()
+	{
+		store.setLoadStatus(true);
+	}
+
+	exports.dataLoadFinished = function()
+	{
+		store.setLoadStatus(false);
+	}
+
 	exports.projectsGetted = function(data, target)
 	{
 		store.setProjects(data, target);

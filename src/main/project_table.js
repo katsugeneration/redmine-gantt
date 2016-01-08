@@ -141,7 +141,7 @@
 				<div style={Object.assign(this.props.style, {"width": 500, "paddingTop" : 8})}>
 				<FlatButton onClick={this._onButtonClick} disabled={this.state.buttonType != "Add"} label="Add" />
 				<FlatButton onClick={this._onButtonClick} disabled={this.state.buttonType != "Update"} label="Update" />
-				<FlatButton onClick={this._onDeleteButtonClick} disabled={this.state.buttonType == "None"} label="Delete" />
+				<FlatButton onClick={this._onDeleteButtonClick} disabled={this.state.buttonType != "Update"} label="Delete" />
 				<Table selectable={true} onRowSelection={this._onRowSelection}>
 					<TableHeader>
 						<TableRow>

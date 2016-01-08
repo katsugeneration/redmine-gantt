@@ -3,7 +3,7 @@
 
 	const React = require('react');
 	const Modal = require('react-modal');
-	const action = require('./issue_window_action.js');
+	const action = require('../main/main_action.js');
 	const store = require('../main/main_store.js');
 	const Issue = require('../Data/issue.js').Issue;
 	const ExtendsDate = require('../Extends/extend_date.js').ExtendsDate;
@@ -127,7 +127,7 @@
 			});
 
 			return (
-				<Modal isOpen={this.state.isOpen} onRequestClose={this._onClose} style={{"content" : {"position" : "absolute", "left": 300, "right" : 300}}}>
+				<Modal isOpen={this.state.isOpen} onRequestClose={this._onClose} style={{"content" : {"position" : "absolute", "left": "50%", "right" : "auto"}}}>
 					<div><TextField placeholder="subject" value={this.state.issue.subject} onChange={this._onSubjectChanged} /></div>
 					<div><label>tracker:<SelectField value={this.state.issue.trackerId} onChange={this._trackerChanged}>{trackerList}</SelectField></label></div>
 					<div><label>start date:<DatePicker mode="landscape" formatDate={this._formatDate} maxDate={new Date(this.state.issue.dueDate)} value={new Date(this.state.issue.startDate)} onChange={this._startDateChanged} /></label></div>

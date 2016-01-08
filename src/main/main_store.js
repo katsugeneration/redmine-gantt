@@ -7,6 +7,7 @@
 
 	exports.__proto__ = EventEmitter.prototype;
 
+	var _loadStatus;
 	var _projects = [];
 	var _issues = new Map();
 	var _users = new Map();
@@ -17,6 +18,12 @@
 		modalType : "Add",
 		modalObject : {}
 	};
+
+	exports.setLoadStatus = function(nextStatus)
+	{
+		_loadStatus = nextStatus;
+		this.emit('load-status');
+	}
 
 	exports.setProjects = function(data, target)
 	{
@@ -108,6 +115,11 @@
 		_issueWindowState.modalType = modalType;
 		_issueWindowState.modalObject = modalObject;
 		this.emit('issue-window-state');
+	}
+
+	exports.LoadStatus = function()
+	{
+		return _loadStatus;
 	}
 
 	exports.Projects = function()

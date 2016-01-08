@@ -10,6 +10,7 @@
 	const AddIssueWindow = require('../IssueWindow/issue_window_view.js').AddIssueWindow;
 	const GanttChart = require('../Chart/gantt_chart.js').GanttChart;
 	const ProjectList = require('./project_table.js').ProjectList;
+	const UpdateDialog = require('./update_dialog.js');
 
 	const GanttData = require('../Chart/gantt_chart.js').GanttData;
 	const ExtendsDate = require('../Extends/extend_date.js').ExtendsDate;
@@ -26,20 +27,25 @@
 				chartType : "Week",
 				chartDateWidth : 10,
 				items : [],
-				isOpen : false,
+				isIssuwWindowOpen : false,
+				isUpdateDialogOpen : false,
 				modalType : "Add",
 				modalObject : {}
 			};
 		},
 		componentDidMount : function()
 		{
+			store.addListener('load-status', this._onLoadStatusChanged);
 			store.addListener('projects', this._onDataChanged);
+			store.addListener('users', this._onDataChanged);
 			store.addListener('issues', this._onDataChanged);
 			store.addListener('issue-window-state', this._onIssueWindowStateChanged);
 		},
 		componentWillUnmount : function()
 		{
+			store.removeListener('load-status', this._onLoadStatusChanged);
 			store.removeListener('projects', this._onDataChanged);
+			store.removeListener('users', this._onDataChanged);
 			store.removeListener('issues', this._onDataChanged);
 			store.removeListener('issue-window-state', this._onIssueWindowStateChanged);
 		},
@@ -53,7 +59,8 @@
 				</SelectField></div>
 				<ProjectList style={{float: "left"}} />
 				<GanttChart height={51} width={this.state.chartDateWidth} type={this.state.chartType} startDate={this.state.startDate} dueDate={this.state.dueDate} style={{overflow: "scroll"}} data={this.state.items}/>
-				<AddIssueWindow isOpen={this.state.isOpen} type={this.state.modalType} relatedObj={this.state.modalObject} onClosed={this._issueWindowClosed}/></div>
+				<AddIssueWindow isOpen={this.state.isIssuwWindowOpen} type={this.state.modalType} relatedObj={this.state.modalObject} onClosed={this._issueWindowClosed}/>
+				<UpdateDialog isOpen={this.state.isUpdateDialogOpen}/></div>
 			);
 		},
 		_onchartTypeChanged : function(event, index, value)
@@ -97,14 +104,18 @@
 			if (dueDate < startDate) dueDate = new ExtendsDate(undefined);
 			this.setState({startDate : startDate, dueDate : dueDate, items : data});
 		},
+		_onLoadStatusChanged : function()
+		{
+			this.setState({isUpdateDialogOpen : store.LoadStatus()});
+		},
 		_onIssueWindowStateChanged : function()
 		{
 			var state = store.issueWindowState();
-			this.setState({ isOpen : state.isOpen, modalType : state.modalType, modalObject : state.modalObject });
+			this.setState({ isIssuwWindowOpen : state.isOpen, modalType : state.modalType, modalObject : state.modalObject });
 		},
 		_issueWindowClosed : function()
 		{
-			this.setState({ isOpen : false });
+			this.setState({ isIssuwWindowOpen : false });
 		}
 	});
 
