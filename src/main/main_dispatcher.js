@@ -18,6 +18,11 @@
 		store.setProjects(data, target);
 	};
 
+	exports.projectsUpdated = function(data, target)
+	{
+		store.updateProjects(data, target);
+	}
+
 	exports.usersGetted = function(data, project_id)
 	{
 		store.setUsers(data, project_id);

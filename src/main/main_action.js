@@ -98,9 +98,18 @@
 	exports.loadProjects = function(target)
 	{
 		if (target == "") return;
-		loadData('/projects.json', function(data){
-			dispatcher.projectsGetted(data, target);
-		});
+
+		function recursion (offset, limit)
+		{
+			loadData('/projects.json?offset=' + offset + '&limit=' + limit, function(data){
+				var obj = JSON.parse(data);
+				if (obj.total_count > obj.offset + obj.limit) recursion(obj.offset + obj.limit, obj.limit);
+				if (obj.offset == 0) dispatcher.projectsGetted(data, target);
+				if (obj.offset != 0) dispatcher.projectsUpdated(data, target);
+			});
+		}
+
+		recursion(0, 100);
 	}
 
 	/**
@@ -118,9 +127,17 @@
 	**/
 	exports.loadIssues =  function(id)
 	{
-		loadData('/issues.json?limit=100&project_id=' + id, function(data){
-			dispatcher.issuesGetted(data, id);
-		});
+		function recursion (offset, limit)
+		{
+			loadData('/issues.json?offset=' + offset + '&limit=' + limit + '&project_id=' + id, function(data){
+				var obj = JSON.parse(data);
+				if (obj.total_count > obj.offset + obj.limit) recursion(obj.offset + obj.limit, obj.limit);
+				if (obj.offset == 0) dispatcher.issuesGetted(data, id);
+				if (obj.offset != 0) dispatcher.issuesUpdated(data, id);
+			});
+		}
+
+		recursion(0, 100);
 	}
 
 	exports.deleteIssue = function(issue)

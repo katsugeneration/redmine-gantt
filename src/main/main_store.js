@@ -45,6 +45,27 @@
 		this.emit('projects');
 	};
 
+	exports.updateProjects = function(data, target)
+	{
+		JSON.parse(data).projects.some(function(project, index){
+			if (project.name.indexOf(target) == -1 &&
+			undefined == _projects.find(function(item, i, array){
+				if (project.parent == undefined) return false;
+				if (item.id == project.parent.id) return item;
+				return false;
+			}) && undefined != _projects.find(function(item){
+				if(item.name == project.name) return item;
+			})) return false;
+
+			var proj = {};
+			proj.__proto__ = project;
+			proj.parent_id = (project.parent == undefined) ? 0 : project.parent.id;
+			_projects.push(proj);
+		});
+
+		this.emit('projects');
+	};
+
 	exports.setUsers = function(data, projectId)
 	{
 		var usersInProject = [];
