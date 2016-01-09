@@ -11,6 +11,7 @@
 	var _projects = [];
 	var _issues = new Map();
 	var _users = new Map();
+	var _statuses = new Map();
 	var _trackers = new Map();
 	var _colors = [];
 	var _issueWindowState = {
@@ -119,6 +120,17 @@
 		this.emit('issues');
 	};
 
+	exports.setIssueStatuses = function(data)
+	{
+		var statuses = JSON.parse(data).issue_statuses;
+
+		statuses.some(function(status, index){
+			_statuses.set(status.id, status);
+		});
+
+		this.emit('issue-statuses');
+	}
+
 	exports.setTrackers = function(data)
 	{
 		var trackers = JSON.parse(data).trackers;
@@ -165,6 +177,7 @@
 					return true;
 				}
 			});
+			if (ret !== undefined) return ret;
 		});
 
 		return ret;
@@ -173,6 +186,11 @@
 	exports.Issues = function(projectId)
 	{
 		return (_issues.get(projectId) == undefined) ? [] : _issues.get(projectId);
+	};
+
+	exports.IssueStatuses = function()
+	{
+		return _statuses;
 	};
 
 	exports.Trackers = function()

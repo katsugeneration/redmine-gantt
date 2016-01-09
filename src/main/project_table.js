@@ -44,6 +44,7 @@
 		{
 			store.addListener('projects', this._onProjectsChanged);
 			store.addListener('issues', this._onDataChanged);
+			action.loadIssueStatuses();
 			action.loadTrackers();
 		},
 		_onProjectsChanged : function()
@@ -70,8 +71,9 @@
 
 				data = data.concat(store.Issues(project.id).map(function(issue, index){
 					var ret = (
-						<TableRow key={issue.id + '-' + issue.updated} selected={row == 1}>
+						<TableRow key={issue.id + '-' + issue.updated} selected={row == 1} >
 							<TableRowColumn>{issue.subject}</TableRowColumn>
+							<TableRowColumn>{store.IssueStatuses().get(issue.statusId).name}</TableRowColumn>
 							<TableRowColumn>{store.Trackers().get(issue.trackerId).name}</TableRowColumn>
 							<TableRowColumn>{issue.assignedUser}</TableRowColumn>
 						</TableRow>
@@ -146,6 +148,7 @@
 					<TableHeader>
 						<TableRow>
 						<TableHeaderColumn tooltip='subject'>Subject</TableHeaderColumn>
+						<TableHeaderColumn tooltip='status'>Status</TableHeaderColumn>
 						<TableHeaderColumn tooltip='task category'>Tracker</TableHeaderColumn>
 						<TableHeaderColumn tooltip='assigned to user'>User</TableHeaderColumn>
 						</TableRow>

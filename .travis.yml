@@ -11,7 +11,7 @@ cache:
     - node_modules
 
 before_script:
-  - gulp babel
+  - npm run build
 
 after_script:
   - codeclimate-test-reporter < lcov.info

@@ -102,6 +102,7 @@
 		function recursion (offset, limit)
 		{
 			loadData('/projects.json?offset=' + offset + '&limit=' + limit, function(data){
+				// support for over 100 projects
 				var obj = JSON.parse(data);
 				if (obj.total_count > obj.offset + obj.limit) recursion(obj.offset + obj.limit, obj.limit);
 				if (obj.offset == 0) dispatcher.projectsGetted(data, target);
@@ -130,6 +131,7 @@
 		function recursion (offset, limit)
 		{
 			loadData('/issues.json?offset=' + offset + '&limit=' + limit + '&project_id=' + id, function(data){
+				// support for over 100 issues
 				var obj = JSON.parse(data);
 				if (obj.total_count > obj.offset + obj.limit) recursion(obj.offset + obj.limit, obj.limit);
 				if (obj.offset == 0) dispatcher.issuesGetted(data, id);
@@ -145,6 +147,16 @@
 		var _this = this;
 		deleteData('/issues/' + issue.id + '.json', function(){
 			_this.loadIssues(issue.projectId);
+		});
+	}
+
+	/**
+	* load the trackers registered with the Redmine.
+	**/
+	exports.loadIssueStatuses = function()
+	{
+		loadData('/issue_statuses.json', function(data){
+			dispatcher.issueStatusesGetted(data);
 		});
 	}
 

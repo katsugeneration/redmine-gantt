@@ -37,21 +37,24 @@
 
 			if (dueDate == "Invalid Date") return(<div style={this.props.style}></div>);
 
-			startDate.setDate(startDate.getDate() - startDate.getDay());
-			dueDate.setDate(dueDate.getDate() + (13 - dueDate.getDay()) % 7);
+			// start Sunday in start date's week
+			startDate.addDate(-startDate.getDay());
+
+			// end Saturday in due date's week
+			dueDate.addDate((13 - dueDate.getDay()) % 7);
 
 			var chartWidth = (new ExtendsDate(dueDate.getTime() - startDate.getTime()).getTotalDate() + 1) * this.props.width + 5;
+			var barcharts = this.props.data.map(function(item, index){
+				var length = (item.dueDate == "Invalid Date") ? 0 : new ExtendsDate(item.dueDate.getTime() - item.startDate.getTime()).getTotalDate() + 1;
+				var start = new ExtendsDate(item.startDate.getTime() - startDate.getTime()).getTotalDate();
+				return <BarChart key={item.key} startPos={start * this.props.width} barHeight={this.props.height} barWidth={length * this.props.width} index={index + 2} color={item.color}/>
+			}, this);
 
 			return(
 				<div style={this.props.style}>
 				<svg width={chartWidth} height={this.props.height * (this.props.data.length + 2)}>
-				<MonthBar {...this.props}s startDate={startDate} dueDate={dueDate} ></MonthBar>
 				<CalendarGrid {...this.props} startDate={startDate} dueDate={dueDate} length={this.props.data.length}></CalendarGrid>
-				{this.props.data.map(function(item, index){
-					var length = (item.dueDate == "Invalid Date") ? 0 : new ExtendsDate(item.dueDate.getTime() - item.startDate.getTime()).getTotalDate() + 1;
-					var start = new ExtendsDate(item.startDate.getTime() - startDate.getTime()).getTotalDate();
-					return <BarChart key={item.key} startPos={start * this.props.width} barHeight={this.props.height} barWidth={length * this.props.width} index={index + 2} color={item.color}/>
-				}, this)}
+				{barcharts}
 				</svg>
 				</div>
 			);
@@ -159,7 +162,10 @@
 			}
 
 			return(
+				<g>
+				<MonthBar {...this.props}></MonthBar>
 				<g>{rowList}</g>
+				</g>
 			);
 		}
 	});

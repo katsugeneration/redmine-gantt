@@ -31,6 +31,10 @@ var UpdateDialog = React.createClass({
 		{
 			"content" : {
 				"height" : 20,
+				"width" : 300,
+				"marginLeft" : "auto",
+				"marginRight" : "auto",
+				"marginTop" : 100
 			}
 		}
 		return (

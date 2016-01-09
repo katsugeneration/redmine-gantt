@@ -10,7 +10,7 @@ if you want to use redmine-gantt, you should act follow command.
 git clone  https://github.com/katsugeneration/redmine-gantt.git
 cd redmine-gantt
 npm install
-gulp babel
+npm run build
 ```
 
 before you use redmine-gantt, you make settings.json that written Redmine access information.

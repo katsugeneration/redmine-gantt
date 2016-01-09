@@ -6,6 +6,7 @@
 		this.projectId = 0;
 		this.subject = "";
 		this.trackerId = 1;
+		this.statusId = 1;
 		this.startDate = "";
 		this.dueDate = "";
 		this.assignedId = 0;
@@ -38,6 +39,7 @@
 		issue.id = json.id;
 		issue.projectId = json.project.id;
 		issue.subject = json.subject;
+		issue.statusId = json.status.id;
 		issue.trackerId = json.tracker.id;
 		issue.startDate = json.start_date;
 		issue.dueDate = json.due_date;

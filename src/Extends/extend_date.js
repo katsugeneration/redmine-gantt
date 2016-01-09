@@ -28,5 +28,17 @@
 		return (new ExtendsDate(this.getTime() - firstDay.getTime()).getTotalWeek() + 1);
 	}
 
+	ExtendsDate.prototype.addDate = function(addValue)
+	{
+		if (Object.prototype.toString.call(addValue).slice(8, -1) !== 'Number') throw new TypeError('argumetn 1 is not number');
+		this.setDate(this.getDate() + addValue);
+	}
+
+	ExtendsDate.prototype.addMonth = function(addValue)
+	{
+		if (Object.prototype.toString.call(addValue).slice(8, -1) !== 'Number') throw new TypeError('argumetn 1 is not number');
+		this.setMonth(this.getMonth() + addValue);
+	}
+
 	exports.ExtendsDate = ExtendsDate;
 })(this);
