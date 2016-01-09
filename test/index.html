@@ -17,7 +17,8 @@
 	var ipc = require('electron').ipcRenderer;
 
 	console.log = function(){
-		ipc.send('log', arguments);
+		var args = Array.prototype.slice.call(arguments);
+		ipc.send('log', args);
 	}
 
 	mocha.run(function(falilures){

@@ -11,7 +11,7 @@ app.on('ready', function() {
 	var rendererFailures = 0;
 	var mo = new mocha();
 	var window = new BrowserWindow({width: 800, height: 600});
-    window.loadURL('file://' +  __dirname +  '/index.html');
+	window.loadURL('file://' +  __dirname +  '/index.html');
 	window.webContents.openDevTools();
 	window.on('closed', function(){
 		process.exit(0);
@@ -20,10 +20,10 @@ app.on('ready', function() {
 	ipc.on('renderer-test-result', function(event, exit_status){
 		rendererFailures = exit_status;
 		rendererFinished.emit('exit');
-    });
+	});
 
 	ipc.on('log', function(event, arguments){
-		console.log(arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]);
+		console.log.apply(this, arguments);
 	});
 
 	ipc.on('settings', function(event ,arg){
@@ -40,11 +40,36 @@ app.on('ready', function() {
 		event.returnValue = ret;
 	});
 
-	mo.addFile("./test/store_test.js");
+	findFile("./test/store", "/*\.js$/").forEach(function(item){
+		console.log(item);
+		mo.addFile(item);
+	});
 
-    mo.ui('bdd').run(function(failures) {
-        rendererFinished.on('exit', function(){
+	mo.ui('bdd').run(function(failures) {
+		rendererFinished.on('exit', function(){
 			process.exit(rendererFailures + failures);
 		});
-    });
+	});
 });
+
+function findFile(dir, matchStr)
+{
+	var ret = [];
+
+	var files = fs.readdirSync(dir);
+
+	files.some(function(file){
+		var file = dir + "/" + file;
+		if(fs.statSync(file).isDirectory())
+		{
+			ret = ret.concat(findFile(file, matchStr));
+		}
+		else if(fs.statSync(file).isFile())
+		{
+			if (file.match(matchStr));
+			ret.push(file);
+		}
+	});
+
+	return ret;
+}

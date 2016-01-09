@@ -30,9 +30,8 @@
 		this.emit('load-status');
 	}
 
-	exports.setProjects = function(data, target)
+	function setProjectVirtual(data, target, callback)
 	{
-		_projects = [];
 		JSON.parse(data).projects.some(function(project, index){
 			if (project.name.indexOf(target) == -1 &&
 			undefined == _projects.find(function(item, i, array){
@@ -41,34 +40,34 @@
 				return false;
 			})) return false;
 
-			var proj = {};
-			proj.__proto__ = project;
-			proj.parent_id = (project.parent == undefined) ? 0 : project.parent.id;
-			_projects.push(proj);
+			if(callback !== undefined && typeof callback == 'function')
+				callback(project);
+
+			project.parent_id = (project.parent == undefined) ? 0 : project.parent.id;
+			_projects.push(project);
 		});
 
-		this.emit('projects');
+		exports.emit('projects');
+	}
+
+	exports.setProjects = function(data, target)
+	{
+		_projects = [];
+		setProjectVirtual(data, target);
 	};
 
 	exports.updateProjects = function(data, target)
 	{
-		JSON.parse(data).projects.some(function(project, index){
-			if (project.name.indexOf(target) == -1 &&
-			undefined == _projects.find(function(item, i, array){
-				if (project.parent == undefined) return false;
-				if (item.id == project.parent.id) return item;
-				return false;
-			}) && undefined != _projects.find(function(item){
-				if(item.name == project.name) return item;
-			})) return false;
-
-			var proj = {};
-			proj.__proto__ = project;
-			proj.parent_id = (project.parent == undefined) ? 0 : project.parent.id;
-			_projects.push(proj);
+		setProjectVirtual(data, target, function(project){
+			// update project when data contains same project
+			_projects.some(function(item, index, array){
+				if(item.id == project.id)
+				{
+					array.pop(item);
+					return true;
+				}
+			});
 		});
-
-		this.emit('projects');
 	};
 
 	exports.setUsers = function(data, projectId)
