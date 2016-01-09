@@ -26,16 +26,16 @@
 				data += chunk;
 			});
 			res.on('end', function(){
-				dispatcher.dataLoadFinished();
+				dispatcher.dispatch({ actionType : 'data-load-finish' });
 				callback(data);
 			})
 		});
 
-		dispatcher.dataLoadStarted();
+		dispatcher.dispatch({ actionType : 'data-load-start' });
 
 		req.end();
 		req.on('error', function(e) {
-			dispatcher.dataLoadFinished();
+			dispatcher.dispatch({ actionType : 'data-load-finish' });
 			console.error(e);
 		});
 	}
@@ -105,8 +105,18 @@
 				// support for over 100 projects
 				var obj = JSON.parse(data);
 				if (obj.total_count > obj.offset + obj.limit) recursion(obj.offset + obj.limit, obj.limit);
-				if (obj.offset == 0) dispatcher.projectsGetted(data, target);
-				if (obj.offset != 0) dispatcher.projectsUpdated(data, target);
+				if (obj.offset == 0)
+					dispatcher.dispatch({
+						actionType : 'projects-get',
+						data : data,
+						target : target
+					});
+				if (obj.offset != 0)
+					dispatcher.dispatch({
+						actionType : 'projects-update',
+						data : data,
+						target : target
+					});
 			});
 		}
 
@@ -119,7 +129,11 @@
 	exports.loadUsers = function(id)
 	{
 		loadData('/projects/' + id + '/memberships.json', function(data){
-			dispatcher.usersGetted(data, id);
+			dispatcher.dispatch({
+				actionType : 'users-get',
+				data : data,
+				id : id
+			});
 		});
 	}
 
@@ -134,8 +148,18 @@
 				// support for over 100 issues
 				var obj = JSON.parse(data);
 				if (obj.total_count > obj.offset + obj.limit) recursion(obj.offset + obj.limit, obj.limit);
-				if (obj.offset == 0) dispatcher.issuesGetted(data, id);
-				if (obj.offset != 0) dispatcher.issuesUpdated(data, id);
+				if (obj.offset == 0)
+					dispatcher.dispatch({
+						actionType : 'issues-get',
+						data : data,
+						id : id
+					});
+				if (obj.offset != 0)
+					dispatcher.dispatch({
+						actionType : 'issues-update',
+						data : data,
+						id : id
+					});
 			});
 		}
 
@@ -156,7 +180,10 @@
 	exports.loadIssueStatuses = function()
 	{
 		loadData('/issue_statuses.json', function(data){
-			dispatcher.issueStatusesGetted(data);
+			dispatcher.dispatch({
+				actionType : 'issue-statuses-get',
+				data : data
+			});
 		});
 	}
 
@@ -166,13 +193,21 @@
 	exports.loadTrackers = function()
 	{
 		loadData('/trackers.json', function(data){
-			dispatcher.trackersGetted(data);
+			dispatcher.dispatch({
+				actionType : 'trackers-get',
+				data : data
+			});
 		});
 	}
 
 	exports.updateIssueWindowState = function(isOpen, modalType, modalObject)
 	{
-		dispatcher.issueWindowStateUpdated(isOpen, modalType, modalObject);
+		dispatcher.dispatch({
+			actionType : 'issue-window-state-update',
+			isOpen : isOpen,
+			modalType : modalType,
+			modalObject : modalObject
+		});
 	}
 
 	exports.postNewIssue = function(data, projectId)

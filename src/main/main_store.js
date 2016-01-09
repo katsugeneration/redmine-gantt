@@ -1,6 +1,8 @@
 (function(exports){
 	'use strict';
 
+
+	const dispatcher = require('./main_dispatcher.js');
 	const EventEmitter = require('events').EventEmitter;
 	const Issue = require('../Data/issue.js').Issue;
 	const Colors = require('material-ui').Styles.Colors;
@@ -202,6 +204,51 @@
 	{
 		return _issueWindowState;
 	};
+
+	dispatcher.register(function(action){
+		switch(action.actionType)
+		{
+			case 'projects-get':
+				exports.setProjects(action.data, action.target)
+				break;
+
+			case 'projects-update':
+				exports.updateProjects(action.data, action.target)
+				break;
+
+			case 'issues-get':
+				exports.setIssues(action.data, action.id);
+				break;
+
+			case 'issues-gupdate':
+				exports.updateIssues(action.data, action.id);
+				break;
+
+			case 'users-get':
+				exports.setUsers(action.data, action.id)
+				break;
+
+			case 'issue-statuses-get':
+				exports.setIssueStatuses(action.data);
+				break;
+
+			case 'trackers-get':
+				exports.setTrackers(action.data);
+				break;
+
+			case 'issue-window-state-update':
+				exports.setIssueWindowState(action.isOpen, action.modalType, action.modalObject);
+				break;
+
+			case 'data-load-start':
+				exports.setLoadStatus(true);
+				break;
+
+			case 'data-load-finish':
+				exports.setLoadStatus(false);
+				break;
+		}
+	});
 
 	var colorNum = 0;
 	var _getColor = function()

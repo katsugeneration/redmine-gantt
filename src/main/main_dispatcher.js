@@ -1,55 +1,25 @@
-(function(exports){
-	'use strict';
 
-	const store = require('./main_store.js');
+'use strict';
 
-	exports.dataLoadStarted = function()
-	{
-		store.setLoadStatus(true);
-	}
+const async = require('async');
+const dispatcher = require('flux').Dispatcher;
+var _parent = new dispatcher();
 
-	exports.dataLoadFinished = function()
-	{
-		store.setLoadStatus(false);
-	}
+var _queue = async.queue( function (payload, callback) {
+	_parent.dispatch(payload);
+    callback();
+}, 1);
 
-	exports.projectsGetted = function(data, target)
-	{
-		store.setProjects(data, target);
-	};
+class MainDispatcher extends dispatcher {}
 
-	exports.projectsUpdated = function(data, target)
-	{
-		store.updateProjects(data, target);
-	}
+MainDispatcher.prototype.dispatch = function(payload)
+{
+	_queue.push(payload);
+}
 
-	exports.usersGetted = function(data, project_id)
-	{
-		store.setUsers(data, project_id);
-	};
+MainDispatcher.prototype.register = function(payload)
+{
+	_parent.register(payload);
+}
 
-	exports.issuesGetted = function(data, project_id)
-	{
-		store.setIssues(data, project_id);
-	};
-
-	exports.issuesUpdated = function(data, project_id)
-	{
-		store.updateIssues(data, project_id);
-	};
-
-	exports.trackersGetted = function(data)
-	{
-		store.setTrackers(data);
-	};
-
-	exports.issueStatusesGetted = function(data)
-	{
-		store.setIssueStatuses(data);
-	}
-
-	exports.issueWindowStateUpdated = function(isOpen, modalType, modalObject)
-	{
-		store.setIssueWindowState(isOpen, modalType, modalObject);
-	}
-})(this);
+module.exports = new MainDispatcher();
