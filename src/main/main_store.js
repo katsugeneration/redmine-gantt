@@ -16,6 +16,8 @@
 	var _statuses = new Map();
 	var _trackers = new Map();
 	var _colors = [];
+	var _selectedTracker = -1;
+	var _selectedStatus = -1;
 	var _issueWindowState = {
 		isOpen : false,
 		modalType : "Add",
@@ -152,6 +154,18 @@
 		this.emit('issue-window-state');
 	}
 
+	exports.updateSelectedTracker = function(tracker)
+	{
+		_selectedTracker = tracker;
+		this.emit('issues');
+	}
+
+	exports.updateSelectedStatus = function(status)
+	{
+		_selectedStatus = status;
+		this.emit('issues');
+	}
+
 	exports.LoadStatus = function()
 	{
 		return _loadStatus;
@@ -187,7 +201,18 @@
 
 	exports.Issues = function(projectId)
 	{
-		return (_issues.get(projectId) == undefined) ? [] : _issues.get(projectId);
+		var issues = _issues.get(projectId);
+		if (issues === undefined) return [];
+
+		var tracker = exports.Trackers().get(_selectedTracker);
+		var issueStatus = exports.IssueStatuses().get(_selectedStatus);
+		if (tracker === undefined && issueStatus === undefined) return issues;
+
+		return issues.filter(function(item, index){
+			if ((tracker == undefined || item.trackerId == _selectedTracker) &&
+				(issueStatus == undefined || item.statusId == _selectedStatus)) return true;
+			return false;
+		});
 	};
 
 	exports.IssueStatuses = function()
@@ -246,6 +271,14 @@
 
 			case 'data-load-finish':
 				exports.setLoadStatus(false);
+				break;
+
+			case 'selected-tracker-update':
+				exports.updateSelectedTracker(action.tracker);
+				break;
+
+			case 'selected-status-update':
+				exports.updateSelectedStatus(action.status);
 				break;
 		}
 	});

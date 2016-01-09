@@ -219,4 +219,20 @@
 	{
 		writeData('PUT', '/issues/' + issueId + '.json', data, function(){ exports.loadIssues(projectId) } );
 	};
+
+	exports.updateSelectedTracker = function(newValue)
+	{
+		dispatcher.dispatch({
+			actionType : 'selected-tracker-update',
+			tracker : newValue
+		});
+	}
+
+	exports.updateSelectedStatus = function(newValue)
+	{
+		dispatcher.dispatch({
+			actionType : 'selected-status-update',
+			status : newValue
+		});
+	}
 })(this);

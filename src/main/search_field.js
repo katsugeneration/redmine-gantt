@@ -31,7 +31,7 @@
 			return (
 				<div>
 				<TextField placeholder="Project Name" value={this.state.textValue} onChange={this._textChanged} onKeyPress={this._keyPressed}/>
-				<FlatButton onClick={this._startSearch} >search</FlatButton>
+				<FlatButton onClick={this._startSearch} secondary={true}>search</FlatButton>
 				</div>
 			);
 		}

@@ -58,7 +58,7 @@
 				<MenuItem value="Week" primaryText="Week" />
 				</SelectField></div>
 				<ProjectList style={{float: "left"}} />
-				<GanttChart height={51} width={this.state.chartDateWidth} type={this.state.chartType} startDate={this.state.startDate} dueDate={this.state.dueDate} style={{overflow: "scroll"}} data={this.state.items}/>
+				<GanttChart height={51} width={this.state.chartDateWidth} type={this.state.chartType} startDate={this.state.startDate} dueDate={this.state.dueDate} style={{overflow: "scroll", paddingTop: 48}} data={this.state.items}/>
 				<AddIssueWindow isOpen={this.state.isIssuwWindowOpen} type={this.state.modalType} relatedObj={this.state.modalObject} onClosed={this._issueWindowClosed}/>
 				<UpdateDialog isOpen={this.state.isUpdateDialogOpen}/></div>
 			);

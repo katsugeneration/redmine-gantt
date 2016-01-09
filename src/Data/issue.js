@@ -5,11 +5,11 @@
 		this.id = 0;
 		this.projectId = 0;
 		this.subject = "";
-		this.trackerId = 1;
-		this.statusId = 1;
+		this.trackerId = -1;
+		this.statusId = -1;
 		this.startDate = "";
 		this.dueDate = "";
-		this.assignedId = 0;
+		this.assignedId = -1;
 		this.assignedUser = "";
 		this.updated = "";
 	};
@@ -26,6 +26,7 @@
 				"project_id" : this.projectId,
 				"subject" : this.subject,
 				"tracker_id" : this.trackerId,
+				"status_id" : this.statusId,
 				"start_date" : this.startDate,
 				"due_date" : this.dueDate,
 				"assigned_to_id" : this.assignedId
