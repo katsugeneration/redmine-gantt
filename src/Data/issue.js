@@ -4,15 +4,15 @@
 	function Issue() {
 		this.id = 0;
 		this.projectId = 0;
-		this.subject = "";
+		this.subject = '';
 		this.trackerId = -1;
 		this.statusId = -1;
-		this.startDate = "";
-		this.dueDate = "";
+		this.startDate = '';
+		this.dueDate = '';
 		this.assignedId = -1;
-		this.assignedUser = "";
-		this.updated = "";
-	};
+		this.assignedUser = '';
+		this.updated = '';
+	}
 
 	Issue.prototype.create = function()
 	{
@@ -22,14 +22,14 @@
 	Issue.prototype.toJSON = function()
 	{
 		return {
-			"issue" : {
-				"project_id" : this.projectId,
-				"subject" : this.subject,
-				"tracker_id" : this.trackerId,
-				"status_id" : this.statusId,
-				"start_date" : this.startDate,
-				"due_date" : this.dueDate,
-				"assigned_to_id" : this.assignedId
+			'issue' : {
+				'project_id' : this.projectId,
+				'subject' : this.subject,
+				'tracker_id' : this.trackerId,
+				'status_id' : this.statusId,
+				'start_date' : this.startDate,
+				'due_date' : this.dueDate,
+				'assigned_to_id' : this.assignedId
 			}
 		};
 	};
@@ -45,10 +45,10 @@
 		issue.startDate = json.start_date;
 		issue.dueDate = json.due_date;
 		issue.assignedId = (json.assigned_to == undefined) ? 0 : json.assigned_to.id;
-		issue.assignedUser = (json.assigned_to == undefined) ? "" : json.assigned_to.name;
+		issue.assignedUser = (json.assigned_to == undefined) ? '' : json.assigned_to.name;
 		issue.updated = json.updated_on;
 		return issue;
-	}
+	};
 
 	exports.Issue = Issue;
 })(this);

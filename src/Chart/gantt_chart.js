@@ -2,11 +2,9 @@
 	'use strict';
 
 	const React = require('react');
-	const reactDOM = require('react-dom');
 	const ExtendsDate = require('../Extends/extend_date.js').ExtendsDate;
-	const store = require('../main/main_store.js');
 
-	const DEFAULT_BARCHART_COLOR = "#9e9e9e";
+	const DEFAULT_BARCHART_COLOR = '#9e9e9e';
 
 	exports.GanttChart = React.createClass({
 		propTypes : {
@@ -25,7 +23,7 @@
 				width : 0,
 				startDate : new ExtendsDate(),
 				dueDate : new ExtendsDate(),
-				type : "Date",
+				type : 'Date',
 				data : [],
 				style : {}
 			};
@@ -35,7 +33,7 @@
 			var startDate = new ExtendsDate(this.props.startDate.toString());
 			var dueDate = new ExtendsDate(this.props.dueDate.toString());
 
-			if (dueDate == "Invalid Date") return(<div style={this.props.style}></div>);
+			if (dueDate == 'Invalid Date') return(<div style={this.props.style}></div>);
 
 			// start Sunday in start date's week
 			startDate.addDate(-startDate.getDay());
@@ -45,9 +43,9 @@
 
 			var chartWidth = (new ExtendsDate(dueDate.getTime() - startDate.getTime()).getTotalDate() + 1) * this.props.width + 5;
 			var barcharts = this.props.data.map(function(item, index){
-				var length = (item.dueDate == "Invalid Date") ? 0 : new ExtendsDate(item.dueDate.getTime() - item.startDate.getTime()).getTotalDate() + 1;
+				var length = (item.dueDate == 'Invalid Date') ? 0 : new ExtendsDate(item.dueDate.getTime() - item.startDate.getTime()).getTotalDate() + 1;
 				var start = new ExtendsDate(item.startDate.getTime() - startDate.getTime()).getTotalDate();
-				return <BarChart key={item.key} startPos={start * this.props.width} barHeight={this.props.height} barWidth={length * this.props.width} index={index + 2} color={item.color}/>
+				return ( <BarChart key={item.key} startPos={start * this.props.width} barHeight={this.props.height} barWidth={length * this.props.width} index={index + 2} color={item.color}/> );
 			}, this);
 
 			return(
@@ -94,8 +92,8 @@
 
 				var start =	new ExtendsDate(monthStartDate.getTime() - this.props.startDate.getTime()).getTotalDate();
 				var interval = new ExtendsDate(nextMonthStartDate.getTime() - monthStartDate.getTime()).getTotalDate();
-				monthBlock.push(<rect key={"rect-" + monthStartDate} x={this.props.width * start} width={this.props.width * interval} height={this.props.height} fill="white" stroke="black"></rect>)
-				monthBlock.push(<text key={"text-" + monthStartDate} x={this.props.width * (start + interval / 2)} y={this.props.height - 5} textAnchor="middle" fill="black">{monthStartDate.getMonth() + 1}</text>);
+				monthBlock.push(<rect key={'rect-' + monthStartDate} x={this.props.width * start} width={this.props.width * interval} height={this.props.height} fill='white' stroke='black'></rect>);
+				monthBlock.push(<text key={'text-' + monthStartDate} x={this.props.width * (start + interval / 2)} y={this.props.height - 5} textAnchor='middle' fill='black'>{monthStartDate.getMonth() + 1}</text>);
 				monthStartDate = nextMonthStartDate;
 			}
 
@@ -125,7 +123,7 @@
 		render :function()
 		{
 			return(
-				<g transform={"translate(0," + this.props.index * this.props.barHeight + ")"}>
+				<g transform={'translate(0,' + this.props.index * this.props.barHeight + ')'}>
 				<rect x={this.props.startPos} width={this.props.barWidth} height={this.props.barHeight} fill={this.props.color}></rect>
 				</g>
 			);
@@ -148,7 +146,7 @@
 				width : 0,
 				startDate : new ExtendsDate(),
 				dueDate : new ExtendsDate(),
-				type : "Date",
+				type : 'Date',
 				length : 0
 			};
 		},
@@ -186,7 +184,7 @@
 				width : 0,
 				startDate : new ExtendsDate(),
 				dueDate : new ExtendsDate(),
-				type : "Week",
+				type : 'Week',
 				index : 0
 			};
 		},
@@ -194,7 +192,7 @@
 		{
 			var interval = 0;
 			var width = 0;
-			if (this.props.type == "Date")
+			if (this.props.type == 'Date')
 			{
 				interval = new ExtendsDate(this.props.dueDate.getTime() - this.props.startDate.getTime()).getTotalDate() + 1;
 				width = this.props.width;
@@ -211,24 +209,24 @@
 			{
 				var date = new ExtendsDate(this.props.startDate.toString());
 
-				if (this.props.type == "Date")
+				if (this.props.type == 'Date')
 				{
 					date.setTime(this.props.startDate.getTime() + i * 24 * 60 * 60 * 1000);
-					dateBlock.push(<rect key={this.props.index + "-" + date} x={width * i} width={width} height={this.props.height} fill="white" stroke="black"></rect>);
+					dateBlock.push(<rect key={this.props.index + '-' + date} x={width * i} width={width} height={this.props.height} fill='white' stroke='black'></rect>);
 					if (this.props.index == 1)
-						dateBlock.push(<text key={"text-" + date} x={width * (i + 1/2)} y={this.props.height - 5} textAnchor="middle" fill="black">{date.getDate()}</text>);
+						dateBlock.push(<text key={'text-' + date} x={width * (i + 1/2)} y={this.props.height - 5} textAnchor='middle' fill='black'>{date.getDate()}</text>);
 				}
 				else
 				{
 					date.setTime(this.props.startDate.getTime() + i * 7 * 24 * 60 * 60 * 1000);
-					dateBlock.push(<rect key={this.props.index + "-" + date} x={width * i} width={width} height={this.props.height} fill="white" stroke="black"></rect>);
+					dateBlock.push(<rect key={this.props.index + '-' + date} x={width * i} width={width} height={this.props.height} fill='white' stroke='black'></rect>);
 					if (this.props.index == 1)
-						dateBlock.push(<text key={"text-" + date} x={width * (i + 1/2)} y={this.props.height - 5} textAnchor="middle" fill="black">{date.getWeek()}</text>);
+						dateBlock.push(<text key={'text-' + date} x={width * (i + 1/2)} y={this.props.height - 5} textAnchor='middle' fill='black'>{date.getWeek()}</text>);
 				}
 			}
 
 			return(
-				<g transform={"translate(0," + this.props.index * this.props.height + ")"}>
+				<g transform={'translate(0,' + this.props.index * this.props.height + ')'}>
 					{dateBlock}
 				</g>
 			);
@@ -237,11 +235,11 @@
 
 	function GanttData()
 	{
-		this.key = "";
+		this.key = '';
 		this.startDate = new ExtendsDate();
 		this.dueDate = new ExtendsDate();
 		this.color = DEFAULT_BARCHART_COLOR;
-	};
+	}
 
 	exports.GanttData = GanttData;
 })(this);

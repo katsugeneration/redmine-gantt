@@ -41,13 +41,13 @@ app.on('ready', function() {
 	});
 });
 
-ipcMain.on('settings', function(event, arg){
-	var ret = "";
+ipcMain.on('settings', function(event){
+	var ret = '';
 	try {
 		// get settings data
 		ret = fs.readFileSync(__dirname + '/settings.json', 'utf8');
 	} catch (e) {
-		dialog.showErrorBox("Redmine Gantt", e.message);
+		dialog.showErrorBox('Redmine Gantt', e.message);
 		app.quit();
 	}
 

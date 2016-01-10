@@ -1,7 +1,6 @@
 var assert = require('assert');
 var sinon = require('sinon');
 var PassThrough = require('stream').PassThrough;
-var ipc = require('electron').ipcRenderer;
 var http = require('http');
 
 var action = require('../dist/main/main_action.js');

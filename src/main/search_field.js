@@ -1,5 +1,5 @@
 (function(exports){
-	'use strict'
+	'use strict';
 
 	const React = require('react');
 
@@ -11,14 +11,14 @@
 		getInitialState : function()
 		{
 			return {
-				textValue: ""
+				textValue: ''
 			};
 		},
 		_textChanged : function(e)
 		{
 			this.setState({textValue : e.target.value});
 		},
-		_startSearch : function(e)
+		_startSearch : function()
 		{
 			action.loadProjects(this.state.textValue);
 		},
@@ -30,7 +30,7 @@
 		{
 			return (
 				<div>
-				<TextField placeholder="Project Name" value={this.state.textValue} onChange={this._textChanged} onKeyPress={this._keyPressed}/>
+				<TextField placeholder='Project Name' value={this.state.textValue} onChange={this._textChanged} onKeyPress={this._keyPressed}/>
 				<FlatButton onClick={this._startSearch} secondary={true}>search</FlatButton>
 				</div>
 			);

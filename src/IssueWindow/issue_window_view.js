@@ -35,7 +35,7 @@
 			return {
 				isOpen : false,
 				issue : new Issue(),
-				mainButtonLabel : "Add",
+				mainButtonLabel : 'Add',
 				mainButtonCallback : function(){}
 			};
 		},
@@ -44,21 +44,21 @@
 			var object = nextProps.relatedObj;
 			var type = nextProps.type;
 			var issue = new Issue();
-			var mainButtonLabel = "";
+			var mainButtonLabel = '';
 			var mainButtonCallback = function(){};
 
-			if(type == "Add")
+			if(type == 'Add')
 			{
 				issue.projectId = object.id;
 				issue.startDate = new ExtendsDate(ExtendsDate.now()).toRedmineFormatString();
 				issue.dueDate = new ExtendsDate(ExtendsDate.now()).toRedmineFormatString();
-				mainButtonLabel = "Create";
+				mainButtonLabel = 'Create';
 				mainButtonCallback = this._addNewIssue;
 			}
-			else if(type == "Update")
+			else if(type == 'Update')
 			{
 				issue = object;
-				mainButtonLabel = "Update";
+				mainButtonLabel = 'Update';
 				mainButtonCallback = this._updateIssue;
 			}
 
@@ -131,23 +131,23 @@
 			});
 
 			var userList = [];
-			userList.push( <MenuItem key={-1} value={-1} primaryText="No Assigned" /> );
-			store.GetProjectUsers(this.state.issue.projectId).some(function(user, index){
+			userList.push( <MenuItem key={-1} value={-1} primaryText='No Assigned' /> );
+			store.GetProjectUsers(this.state.issue.projectId).some(function(user){
 				userList.push( <MenuItem key={user.id} value={user.id} primaryText={user.name} /> );
 			});
 
 			return (
-				<Modal isOpen={this.state.isOpen} onRequestClose={this._onClose} style={{"content" : {"position" : "absolute", "width": "300", "marginLeft" : "auto", "marginRight" : "auto"}}}>
-					<div><TextField placeholder="subject" value={this.state.issue.subject} onChange={this._onSubjectChanged} /></div>
+				<Modal isOpen={this.state.isOpen} onRequestClose={this._onClose} style={{'content' : {'position' : 'absolute', 'width': '300', 'marginLeft' : 'auto', 'marginRight' : 'auto'}}}>
+					<div><TextField placeholder='subject' value={this.state.issue.subject} onChange={this._onSubjectChanged} /></div>
 					<div><label>tracker:<SelectField value={this.state.issue.trackerId} onChange={this._trackerChanged}>{trackerList}</SelectField></label></div>
 					<div><label>status:   <SelectField value={this.state.issue.statusId} onChange={this._statusChanged}>{statusList}</SelectField></label></div>
-					<div><label>start date:<DatePicker mode="landscape" formatDate={this._formatDate} maxDate={new Date(this.state.issue.dueDate)} value={new Date(this.state.issue.startDate)} onChange={this._startDateChanged} /></label></div>
-					<div><label>due date:<DatePicker mode="landscape" formatDate={this._formatDate} minDate={new Date(this.state.issue.startDate)} value={new Date(this.state.issue.dueDate)} onChange={this._dueDateChanged} /></label></div>
+					<div><label>start date:<DatePicker mode='landscape' formatDate={this._formatDate} maxDate={new Date(this.state.issue.dueDate)} value={new Date(this.state.issue.startDate)} onChange={this._startDateChanged} /></label></div>
+					<div><label>due date:<DatePicker mode='landscape' formatDate={this._formatDate} minDate={new Date(this.state.issue.startDate)} value={new Date(this.state.issue.dueDate)} onChange={this._dueDateChanged} /></label></div>
 					<div><label>assigned to:<SelectField value={this.state.issue.assignedId} onChange={this._assignedIdChanged}>{userList}</SelectField></label></div>
 					<div><FlatButton onClick={this.state.mainButtonCallback} label={this.state.mainButtonLabel} secondary={true}/>
-					<FlatButton onClick={this._onClose} label="Cancel" /></div>
+					<FlatButton onClick={this._onClose} label='Cancel' /></div>
 				</Modal>
-		 	);
+			);
 		}
 	});
 })(this);

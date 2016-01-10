@@ -16,7 +16,7 @@
 	const TableRow = require('material-ui').TableRow;
 	const TableRowColumn = require('material-ui').TableRowColumn;
 
-	exports.ProjectList =　React.createClass({
+	exports.ProjectList = React.createClass({
 		propTypes : {
 			style : React.PropTypes.object
 		},
@@ -31,7 +31,7 @@
 			return {
 				items : [],
 				selectedRows : [],
-				buttonType : "None",
+				buttonType : 'None',
 				buttonRelatedObject : {},
 				selectedTracker : -1,
 				selectedStatus : -1
@@ -51,7 +51,7 @@
 		},
 		_onProjectsChanged : function()
 		{
-			store.Projects().some(function(project, index){
+			store.Projects().some(function(project){
 				action.loadUsers(project.id);
 				action.loadIssues(project.id);
 			});
@@ -62,7 +62,7 @@
 			var data = [];
 			var row = (this.state.selectedRows.length == 0) ? 0 : this.state.selectedRows[0] + 1;
 
-			store.Projects().some(function(project, index){
+			store.Projects().some(function(project){
 				data.push(
 					<TableRow key={project.name} selected={row == 1}>
 						<TableRowColumn>{project.name}</TableRowColumn>
@@ -71,7 +71,7 @@
 				);
 				row--;
 
-				data = data.concat(store.Issues(project.id).map(function(issue, index){
+				data = data.concat(store.Issues(project.id).map(function(issue){
 					var ret = (
 						<TableRow key={issue.id + '-' + issue.updated} selected={row == 1} >
 							<TableRowColumn>{issue.subject}</TableRowColumn>
@@ -94,7 +94,7 @@
 			{
 				// for button click, set timer 100ms
 				setTimeout(function(self){
-					self.state.buttonType = "None";
+					self.state.buttonType = 'None';
 					self.state.buttonRelatedObject = {};
 					self.state.selectedRows = [];
 					self._onDataChanged();
@@ -103,13 +103,13 @@
 			}
 
 			var row = selectedRows[0] + 1;
-			var type = "";
+			var type = '';
 			var object = {};
 
-			store.Projects().some(function(project, index){
+			store.Projects().some(function(project){
 				if (row == 1)
 				{
-					type = "Add";
+					type = 'Add';
 					object = project;
 					return true;
 				}
@@ -117,7 +117,7 @@
 				row--;
 				if (row < store.Issues(project.id).length)
 				{
-					type = "Update";
+					type = 'Update';
 					object = store.Issues(project.id)[row - 1];
 					return true;
 				}
@@ -152,12 +152,12 @@
 		render : function()
 		{
 			return (
-				<div style={Object.assign(this.props.style, {"width": 500, "paddingTop" : 8})}>
+				<div style={Object.assign(this.props.style, {'width': 500, 'paddingTop' : 8})}>
 				<div><ItemsSelectField items={store.Trackers()} selectedValue={this.state.selectedTracker} onValueChanged={this._trackerChanged}/>
 				<ItemsSelectField items={store.IssueStatuses()} selectedValue={this.state.selectedStatus} onValueChanged={this._issueStatusChanged}/></div>
-				<FlatButton onClick={this._onButtonClick} disabled={this.state.buttonType != "Add"} label="Add" />
-				<FlatButton onClick={this._onButtonClick} disabled={this.state.buttonType != "Update"} label="Update" />
-				<FlatButton onClick={this._onDeleteButtonClick} disabled={this.state.buttonType != "Update"} label="Delete" />
+				<FlatButton onClick={this._onButtonClick} disabled={this.state.buttonType != 'Add'} label='Add' />
+				<FlatButton onClick={this._onButtonClick} disabled={this.state.buttonType != 'Update'} label='Update' />
+				<FlatButton onClick={this._onDeleteButtonClick} disabled={this.state.buttonType != 'Update'} label='Delete' />
 				<Table selectable={true} onRowSelection={this._onRowSelection}>
 					<TableHeader>
 						<TableRow>
@@ -193,7 +193,7 @@
 		},
 		render : function(){
 			var menuItems = [];
-			menuItems.push( <MenuItem key={-1} value={-1} primaryText={"None"} />  );
+			menuItems.push( <MenuItem key={-1} value={-1} primaryText={'None'} />  );
 
 			this.props.items.forEach(function(value, key){
 				menuItems.push( <MenuItem key={key} value={key} primaryText={value.name} /> );

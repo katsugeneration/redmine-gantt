@@ -12,13 +12,13 @@ var UpdateDialog = React.createClass({
 	{
 		return {
 			isOpen : true
-		}
+		};
 	},
 	getInitialState : function()
 	{
 		return {
 			opacity : 1,
-			isIncreased : false,
+			isIncreased : false
 		};
 	},
 	componentDidMount : function()
@@ -27,19 +27,19 @@ var UpdateDialog = React.createClass({
 	},
 	render : function()
 	{
-		var style =
-		{
-			"content" : {
-				"height" : 20,
-				"width" : 300,
-				"marginLeft" : "auto",
-				"marginRight" : "auto",
-				"marginTop" : 100
+		var style = {
+			'content' : {
+				'height' : 20,
+				'width' : 300,
+				'marginLeft' : 'auto',
+				'marginRight' : 'auto',
+				'marginTop' : 100
 			}
-		}
+		};
+
 		return (
 			<Modal isOpen={this.props.isOpen} style={style}>
-          		<span key="updating" style={{"opacity" : this.state.opacity	}}>Updateing...</span>
+				<span key='updating' style={{'opacity' : this.state.opacity	}}>Updateing...</span>
 			</Modal>
 		);
 	},

@@ -13,12 +13,11 @@
 	**/
 	var loadData = function(path, callback)
 	{
-		var _this = this;
-		var data = "";
+		var data = '';
 		var req = protocol.request({
 			hostname : settings.host,
 			path : path,
-			auth : settings.name + ":" + settings.password
+			auth : settings.name + ':' + settings.password
 		}, function(res){
 			res.setEncoding('utf8');
 			if (res.statusCode != 200) return;
@@ -28,7 +27,7 @@
 			res.on('end', function(){
 				dispatcher.dispatch({ actionType : 'data-load-finish' });
 				callback(data);
-			})
+			});
 		});
 
 		dispatcher.dispatch({ actionType : 'data-load-start' });
@@ -38,20 +37,18 @@
 			dispatcher.dispatch({ actionType : 'data-load-finish' });
 			console.error(e);
 		});
-	}
+	};
 
 	/**
 	* delete data method from Redmine.
 	**/
 	var deleteData = function(path, callback)
 	{
-		var _this = this;
-		var data = "";
 		var req = protocol.request({
 			hostname : settings.host,
 			path : path,
 			method : 'DELETE',
-			auth : settings.name + ":" + settings.password
+			auth : settings.name + ':' + settings.password
 		}, function(res){
 			res.setEncoding('utf8');
 			if (res.statusCode != 200) return;
@@ -62,7 +59,7 @@
 		req.on('error', function(e) {
 			console.error(e);
 		});
-	}
+	};
 
 	/**
 	* get Data from Redmine's specific path. If Successed, do callback.
@@ -73,11 +70,11 @@
 		var req = protocol.request({
 			hostname : settings.host,
 			path : path,
-			auth : settings.name + ":" + settings.password,
+			auth : settings.name + ':' + settings.password,
 			method : method,
 			headers: {
 				'Content-Type' : 'application/json',
-				'Content-Length' : encodeURIComponent(writeData).replace(/%../g,"x").length
+				'Content-Length' : encodeURIComponent(writeData).replace(/%../g,'x').length
 			}
 		}, function(res){
 			res.setEncoding('utf8');
@@ -97,7 +94,7 @@
 	**/
 	exports.loadProjects = function(target)
 	{
-		if (target == "") return;
+		if (target == '') return;
 
 		function recursion (offset, limit)
 		{
@@ -121,7 +118,7 @@
 		}
 
 		recursion(0, 100);
-	}
+	};
 
 	/**
 	* load the users related with the project whose id is "id".
@@ -135,7 +132,7 @@
 				id : id
 			});
 		});
-	}
+	};
 
 	/**
 	* load the issues registered the project whose id is "id".
@@ -164,7 +161,7 @@
 		}
 
 		recursion(0, 100);
-	}
+	};
 
 	exports.deleteIssue = function(issue)
 	{
@@ -172,7 +169,7 @@
 		deleteData('/issues/' + issue.id + '.json', function(){
 			_this.loadIssues(issue.projectId);
 		});
-	}
+	};
 
 	/**
 	* load the trackers registered with the Redmine.
@@ -185,7 +182,7 @@
 				data : data
 			});
 		});
-	}
+	};
 
 	/**
 	* load the trackers registered with the Redmine.
@@ -198,7 +195,7 @@
 				data : data
 			});
 		});
-	}
+	};
 
 	exports.updateIssueWindowState = function(isOpen, modalType, modalObject)
 	{
@@ -208,16 +205,16 @@
 			modalType : modalType,
 			modalObject : modalObject
 		});
-	}
+	};
 
 	exports.postNewIssue = function(data, projectId)
 	{
-		writeData('POST', '/issues.json', data, function(){ exports.loadIssues(projectId) } );
+		writeData('POST', '/issues.json', data, function(){ exports.loadIssues(projectId); } );
 	};
 
 	exports.updateIssue = function(issueId, data, projectId)
 	{
-		writeData('PUT', '/issues/' + issueId + '.json', data, function(){ exports.loadIssues(projectId) } );
+		writeData('PUT', '/issues/' + issueId + '.json', data, function(){ exports.loadIssues(projectId); } );
 	};
 
 	exports.updateSelectedTracker = function(newValue)
@@ -226,7 +223,7 @@
 			actionType : 'selected-tracker-update',
 			tracker : newValue
 		});
-	}
+	};
 
 	exports.updateSelectedStatus = function(newValue)
 	{
@@ -234,5 +231,5 @@
 			actionType : 'selected-status-update',
 			status : newValue
 		});
-	}
+	};
 })(this);

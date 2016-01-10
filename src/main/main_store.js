@@ -20,7 +20,7 @@
 	var _selectedStatus = -1;
 	var _issueWindowState = {
 		isOpen : false,
-		modalType : "Add",
+		modalType : 'Add',
 		modalObject : {}
 	};
 
@@ -28,13 +28,13 @@
 	{
 		_loadStatus = nextStatus;
 		this.emit('load-status');
-	}
+	};
 
 	function setProjectVirtual(data, target, callback)
 	{
-		JSON.parse(data).projects.some(function(project, index){
+		JSON.parse(data).projects.some(function(project){
 			if (project.name.indexOf(target) == -1 &&
-			undefined == _projects.find(function(item, i, array){
+			undefined == _projects.find(function(item){
 				if (project.parent == undefined) return false;
 				if (item.id == project.parent.id) return item;
 				return false;
@@ -74,7 +74,7 @@
 	{
 		var usersInProject = [];
 		var memberships = JSON.parse(data).memberships;
-		memberships.some(function(membership, index){
+		memberships.some(function(membership){
 			if(membership.user != undefined)
 			{
 				var user = exports.Users(membership.user.id);
@@ -93,9 +93,9 @@
 
 	exports.setIssues = function(data, projectId)
 	{
-		_issues.set(projectId, JSON.parse(data).issues.filter(function(item, index){
+		_issues.set(projectId, JSON.parse(data).issues.filter(function(item){
 			if(item.project.id == projectId) return true;
-		}).map(function(item, index){
+		}).map(function(item){
 			return Issue.toIssueFromJSON(item);
 		}));
 		this.emit('issues');
@@ -105,12 +105,12 @@
 	{
 		var issuesInProject = _issues.get(projectId);
 
-		JSON.parse(data).issues.filter(function(item, index){
-			 if(item.project.id == projectId) return true;
-		}).map(function(item, index){
+		JSON.parse(data).issues.filter(function(item){
+			if(item.project.id == projectId) return true;
+		}).map(function(item){
 			return Issue.toIssueFromJSON(item);
-		}).some(function(updated, index){
-			issuesInProject.some(function(old, index){
+		}).some(function(updated){
+			issuesInProject.some(function(old){
 				if(updated.id == old.id)
 				{
 					issuesInProject.push(updated);
@@ -127,18 +127,18 @@
 	{
 		var statuses = JSON.parse(data).issue_statuses;
 
-		statuses.some(function(status, index){
+		statuses.some(function(status){
 			_statuses.set(status.id, status);
 		});
 
 		this.emit('issue-statuses');
-	}
+	};
 
 	exports.setTrackers = function(data)
 	{
 		var trackers = JSON.parse(data).trackers;
 
-		trackers.some(function(tracker, index){
+		trackers.some(function(tracker){
 			_trackers.set(tracker.id, tracker);
 		});
 
@@ -151,24 +151,24 @@
 		_issueWindowState.modalType = modalType;
 		_issueWindowState.modalObject = modalObject;
 		this.emit('issue-window-state');
-	}
+	};
 
 	exports.updateSelectedTracker = function(tracker)
 	{
 		_selectedTracker = tracker;
 		this.emit('issues');
-	}
+	};
 
 	exports.updateSelectedStatus = function(status)
 	{
 		_selectedStatus = status;
 		this.emit('issues');
-	}
+	};
 
 	exports.LoadStatus = function()
 	{
 		return _loadStatus;
-	}
+	};
 
 	exports.Projects = function()
 	{
@@ -185,7 +185,7 @@
 		var ret = undefined;
 
 		_users.forEach(function(users){
-			users.some(function(user ,index){
+			users.some(function(user){
 				if (user.id == userId)
 				{
 					ret = user;
@@ -196,7 +196,7 @@
 		});
 
 		return ret;
-	}
+	};
 
 	exports.Issues = function(projectId)
 	{
@@ -207,7 +207,7 @@
 		var issueStatus = exports.IssueStatuses().get(_selectedStatus);
 		if (tracker === undefined && issueStatus === undefined) return issues;
 
-		return issues.filter(function(item, index){
+		return issues.filter(function(item){
 			if ((tracker == undefined || item.trackerId == _selectedTracker) &&
 				(issueStatus == undefined || item.statusId == _selectedStatus)) return true;
 			return false;
@@ -232,53 +232,53 @@
 	dispatcher.register(function(action){
 		switch(action.actionType)
 		{
-			case 'projects-get':
-				exports.setProjects(action.data, action.target)
-				break;
+		case 'projects-get':
+			exports.setProjects(action.data, action.target);
+			break;
 
-			case 'projects-update':
-				exports.updateProjects(action.data, action.target)
-				break;
+		case 'projects-update':
+			exports.updateProjects(action.data, action.target);
+			break;
 
-			case 'issues-get':
-				exports.setIssues(action.data, action.id);
-				break;
+		case 'issues-get':
+			exports.setIssues(action.data, action.id);
+			break;
 
-			case 'issues-gupdate':
-				exports.updateIssues(action.data, action.id);
-				break;
+		case 'issues-gupdate':
+			exports.updateIssues(action.data, action.id);
+			break;
 
-			case 'users-get':
-				exports.setUsers(action.data, action.id)
-				break;
+		case 'users-get':
+			exports.setUsers(action.data, action.id);
+			break;
 
-			case 'issue-statuses-get':
-				exports.setIssueStatuses(action.data);
-				break;
+		case 'issue-statuses-get':
+			exports.setIssueStatuses(action.data);
+			break;
 
-			case 'trackers-get':
-				exports.setTrackers(action.data);
-				break;
+		case 'trackers-get':
+			exports.setTrackers(action.data);
+			break;
 
-			case 'issue-window-state-update':
-				exports.setIssueWindowState(action.isOpen, action.modalType, action.modalObject);
-				break;
+		case 'issue-window-state-update':
+			exports.setIssueWindowState(action.isOpen, action.modalType, action.modalObject);
+			break;
 
-			case 'data-load-start':
-				exports.setLoadStatus(true);
-				break;
+		case 'data-load-start':
+			exports.setLoadStatus(true);
+			break;
 
-			case 'data-load-finish':
-				exports.setLoadStatus(false);
-				break;
+		case 'data-load-finish':
+			exports.setLoadStatus(false);
+			break;
 
-			case 'selected-tracker-update':
-				exports.updateSelectedTracker(action.tracker);
-				break;
+		case 'selected-tracker-update':
+			exports.updateSelectedTracker(action.tracker);
+			break;
 
-			case 'selected-status-update':
-				exports.updateSelectedStatus(action.status);
-				break;
+		case 'selected-status-update':
+			exports.updateSelectedStatus(action.status);
+			break;
 		}
 	});
 

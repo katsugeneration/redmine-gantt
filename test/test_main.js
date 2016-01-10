@@ -26,7 +26,8 @@ app.on('ready', function() {
 		console.log.apply(this, arguments);
 	});
 
-	ipc.on('settings', function(event ,arg){
+	ipc.on('settings', function(event){
+		var ret = '';
 		try
 		{
 			ret = fs.readFileSync('./test/test_settings.json', 'utf8');
@@ -34,13 +35,13 @@ app.on('ready', function() {
 		catch (e)
 		{
 			console.log(e.message);
-			ret = "";
+			ret = '';
 		}
 
 		event.returnValue = ret;
 	});
 
-	findFile("./test/store", "/*\.js$/").forEach(function(item){
+	findFile('./test/store', '/*\.js$/').forEach(function(item){
 		console.log(item);
 		mo.addFile(item);
 	});
@@ -59,15 +60,15 @@ function findFile(dir, matchStr)
 	var files = fs.readdirSync(dir);
 
 	files.some(function(file){
-		var file = dir + "/" + file;
+		var file = dir + '/' + file;
 		if(fs.statSync(file).isDirectory())
 		{
 			ret = ret.concat(findFile(file, matchStr));
 		}
 		else if(fs.statSync(file).isFile())
 		{
-			if (file.match(matchStr));
-			ret.push(file);
+			if (file.match(matchStr))
+				ret.push(file);
 		}
 	});
 
