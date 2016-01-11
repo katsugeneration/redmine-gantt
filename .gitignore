@@ -3,3 +3,4 @@ node_modules/*
 .tags1
 settings.json
 dist/*
+coverage/*

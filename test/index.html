@@ -9,8 +9,13 @@
 	<div id="mocha"></div>
 	<script src="../node_modules/mocha/mocha.js"></script>
 	<script>
+	var Coverager = require('./test_coverager.js');
+
 	mocha.setup('bdd');
 	mocha.reporter('list');
+
+	var coverager = new Coverager();
+	coverager.initCoverage('coverage/renderer', function(filename){ console.log(filename); return (filename.indexOf('dist') != -1); });
 	</script>
 	<script src="./main_action_test.js"></script>
 	<script>
@@ -22,6 +27,7 @@
 	}
 
 	mocha.run(function(falilures){
+		coverager.writeCoverage();
 		ipc.send('renderer-test-result', falilures);
 	});
 	</script>

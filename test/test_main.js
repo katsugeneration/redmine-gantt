@@ -5,6 +5,7 @@ var EventEmitter = require('events');
 var fs = require('fs');
 
 var mocha = require('mocha');
+var Coverager = require('./test_coverager.js');
 
 app.on('ready', function() {
 	var rendererFinished = new EventEmitter();
@@ -41,17 +42,25 @@ app.on('ready', function() {
 		event.returnValue = ret;
 	});
 
-	findFile('./test/store', '/*\.js$/').forEach(function(item){
-		console.log(item);
+	var coverager = new Coverager();
+	coverager.initCoverage(process.cwd() + '/coverage/store', isCheckSrcFile);
+
+	findFile('./test/store', new RegExp('.*\.js$')).forEach(function(item){
 		mo.addFile(item);
 	});
 
 	mo.ui('bdd').run(function(failures) {
 		rendererFinished.on('exit', function(){
+			coverager.writeCoverage();
 			process.exit(rendererFailures + failures);
 		});
 	});
 });
+
+function isCheckSrcFile(filename)
+{
+	return (filename.indexOf(process.cwd() + '/dist') != -1);
+}
 
 function findFile(dir, matchStr)
 {
@@ -59,15 +68,15 @@ function findFile(dir, matchStr)
 
 	var files = fs.readdirSync(dir);
 
-	files.some(function(file){
-		var file = dir + '/' + file;
+	files.some(function(name){
+		var file = dir + '/' + name;
 		if(fs.statSync(file).isDirectory())
 		{
 			ret = ret.concat(findFile(file, matchStr));
 		}
 		else if(fs.statSync(file).isFile())
 		{
-			if (file.match(matchStr))
+			if (file.search(matchStr) != -1)
 				ret.push(file);
 		}
 	});
