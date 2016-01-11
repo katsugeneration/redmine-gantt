@@ -3,6 +3,7 @@
 const Module = require('module');
 const fs = require('fs');
 const istanbul = require('istanbul');
+const Helper = require('./test_helper.js');
 
 function Coverager()
 {
@@ -18,7 +19,7 @@ Coverager.prototype.initCoverage = function (outputdir, fileCheckFn)
 
 	// reporter setting
 	this.reporter.dir = outputdir;
-	this.reporter.addAll(['json', 'text']);
+	this.reporter.addAll(['json']);
 
 	// override native node func when load module.
 	var _this = this;
@@ -38,6 +39,19 @@ Coverager.prototype.writeCoverage = function()
 	// write coverage data
 	this.collector.add(global['__coverage__']);
 	this.reporter.write(this.collector, true, function(){});
+};
+
+Coverager.totalCoverage = function(rootDir, outputDir)
+{
+	var collector = new istanbul.Collector(),
+		reporter = new istanbul.Reporter();
+	reporter.dir = outputDir;
+	reporter.addAll(['lcov', 'text']);
+
+	Helper.findFile(rootDir, new RegExp('coverage.*\.json$')).some(function(filename){
+		collector.add(JSON.parse(fs.readFileSync(filename, 'utf8')));
+	});
+	reporter.write(collector, true, function(){});
 };
 
 module.exports = Coverager;

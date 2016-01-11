@@ -9,27 +9,58 @@
 	<div id="mocha"></div>
 	<script src="../node_modules/mocha/mocha.js"></script>
 	<script>
-	var Coverager = require('./test_coverager.js');
 
+	// setup mocha
 	mocha.setup('bdd');
 	mocha.reporter('list');
 
+	// setup coverage instrument
+	var Coverager = require(__dirname + '/test_coverager.js');
 	var coverager = new Coverager();
-	coverager.initCoverage('coverage/renderer', function(filename){ console.log(filename); return (filename.indexOf('dist') != -1); });
-	</script>
-	<script src="./main_action_test.js"></script>
-	<script>
-	var ipc = require('electron').ipcRenderer;
+	coverager.initCoverage('coverage/renderer', function(file){ return (file.indexOf('dist') != -1); });
 
-	console.log = function(){
-		var args = Array.prototype.slice.call(arguments);
-		ipc.send('log', args);
-	}
+	// load test file dynamically
+	var head = document.getElementsByTagName('head')[0];
+	const Helper = require(__dirname + '/test_helper.js');
 
-	mocha.run(function(falilures){
-		coverager.writeCoverage();
-		ipc.send('renderer-test-result', falilures);
+	var files = Helper.findFile(__dirname + '/renderer', new RegExp('.*\.js$'));
+	var count = 0;
+	files.forEach(function(file){
+		var done = false;
+		var script = document.createElement('script');
+		script.src = file;
+		head.appendChild(script);
+
+		script.onload = function() {
+			if ( !done && (!this.readyState || this.readyState === "loaded") ) {
+				count++;
+				done = true
+			}
+		};
 	});
+
+	var timer = setInterval(function(){
+		if (files.length <= count)
+		{
+			// after loaded all test file
+
+			var ipc = require('electron').ipcRenderer;
+
+			// output log to test executing console
+			console.log = function(){
+				var args = Array.prototype.slice.call(arguments);
+				ipc.send('log', args);
+			}
+
+			mocha.run(function(falilures){
+				coverager.writeCoverage();
+				ipc.send('renderer-test-result', falilures);
+			});
+
+			clearInterval(timer);
+		}
+	}, 20);
+
 	</script>
 </body>
 </html>

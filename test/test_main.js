@@ -1,17 +1,19 @@
-var app = require('app');
-var BrowserWindow = require('browser-window');
-var ipc = require('electron').ipcMain;
-var EventEmitter = require('events');
-var fs = require('fs');
+const app = require('app');
+const BrowserWindow = require('browser-window');
+const ipc = require('electron').ipcMain;
+const EventEmitter = require('events');
+const fs = require('fs');
 
-var mocha = require('mocha');
-var Coverager = require('./test_coverager.js');
+const mocha = require('mocha');
+const Coverager = require('./test_coverager.js');
+const Helper = require('./test_helper.js');
 
 app.on('ready', function() {
 	var rendererFinished = new EventEmitter();
 	var rendererFailures = 0;
 	var mo = new mocha();
 	var window = new BrowserWindow({width: 800, height: 600});
+
 	window.loadURL('file://' +  __dirname +  '/index.html');
 	window.webContents.openDevTools();
 	window.on('closed', function(){
@@ -45,13 +47,14 @@ app.on('ready', function() {
 	var coverager = new Coverager();
 	coverager.initCoverage(process.cwd() + '/coverage/store', isCheckSrcFile);
 
-	findFile('./test/store', new RegExp('.*\.js$')).forEach(function(item){
+	Helper.findFile('./test/store', new RegExp('.*\.js$')).forEach(function(item){
 		mo.addFile(item);
 	});
 
 	mo.ui('bdd').run(function(failures) {
+		coverager.writeCoverage();
 		rendererFinished.on('exit', function(){
-			coverager.writeCoverage();
+			Coverager.totalCoverage(process.cwd() + '/coverage', process.cwd() + '/coverage');
 			process.exit(rendererFailures + failures);
 		});
 	});
@@ -60,26 +63,4 @@ app.on('ready', function() {
 function isCheckSrcFile(filename)
 {
 	return (filename.indexOf(process.cwd() + '/dist') != -1);
-}
-
-function findFile(dir, matchStr)
-{
-	var ret = [];
-
-	var files = fs.readdirSync(dir);
-
-	files.some(function(name){
-		var file = dir + '/' + name;
-		if(fs.statSync(file).isDirectory())
-		{
-			ret = ret.concat(findFile(file, matchStr));
-		}
-		else if(fs.statSync(file).isFile())
-		{
-			if (file.search(matchStr) != -1)
-				ret.push(file);
-		}
-	});
-
-	return ret;
 }
