@@ -3,8 +3,8 @@
   "version": "0.1.2",
   "main": "main.js",
   "scripts": {
-    "start": "electron .",
-    "test": "gulp test",
+    "start": "npm run build; electron .",
+    "test": "npm run build; gulp test",
     "build": "gulp babel"
   },
   "repository": {

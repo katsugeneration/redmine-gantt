@@ -52,6 +52,7 @@
 				ipc.send('log', args);
 			}
 
+			mocha.checkLeaks();
 			mocha.run(function(falilures){
 				coverager.writeCoverage();
 				ipc.send('renderer-test-result', falilures);
