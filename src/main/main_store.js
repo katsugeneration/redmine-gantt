@@ -91,30 +91,30 @@
 		this.emit('users');
 	};
 
-	exports.setIssues = function(data, projectId)
+	function getProjectIssuesFromJSON(data, projectId)
 	{
-		_issues.set(projectId, JSON.parse(data).issues.filter(function(item){
+		return JSON.parse(data).issues.filter(function(item){
 			if(item.project.id == projectId) return true;
 		}).map(function(item){
 			return Issue.toIssueFromJSON(item);
-		}));
+		});
+	}
+
+	exports.setIssues = function(data, projectId)
+	{
+		var issues = getProjectIssuesFromJSON(data, projectId);
+
+		_issues.set(projectId, issues);
 		this.emit('issues');
 	};
 
 	exports.updateIssues = function(data, projectId)
 	{
-		var issuesInProject = _issues.get(projectId);
-
-		JSON.parse(data).issues.filter(function(item){
-			if(item.project.id == projectId) return true;
-		}).map(function(item){
-			return Issue.toIssueFromJSON(item);
-		}).some(function(updated){
-			issuesInProject.some(function(old){
+		getProjectIssuesFromJSON(data, projectId).some(function(updated){
+			_issues.get(projectId).some(function(old){
 				if(updated.id == old.id)
 				{
-					issuesInProject.push(updated);
-					issuesInProject.pop(old);
+					Issue.copyTo(old, updated);
 					return true;
 				}
 			});

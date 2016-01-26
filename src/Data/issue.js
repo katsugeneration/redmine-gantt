@@ -50,5 +50,19 @@
 		return issue;
 	};
 
+	Issue.copyTo = function(to, from)
+	{
+		to.id = from.id;
+		to.projectId = from.projectId;
+		to.subject = from.subject;
+		to.trackerId = from.trackerId;
+		to.statusId = from.statusId;
+		to.startDate = from.startDate;
+		to.dueDate = from.dueDate;
+		to.assignedId = from.assignedId;
+		to.assignedUser = from.assignedUser;
+		to.updated = from.updated;
+	};
+
 	exports.Issue = Issue;
 })(this);

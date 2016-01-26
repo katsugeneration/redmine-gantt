@@ -10,9 +10,9 @@ var Issue = require('../dist/Data/issue.js').Issue;
 describe('action test', function(){
 	describe('base function test', function(){
 		var requestStub,
-		ret,
-		response,
-		dispatch;
+			ret,
+			response,
+			dispatch;
 
 		beforeEach(function(){
 			dispatch = sinon.spy(dispatcher, 'dispatch');

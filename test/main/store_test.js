@@ -1,4 +1,5 @@
 var assert = require('assert');
+var sinon = require('sinon');
 var store = require('../../dist/main/main_store.js');
 var fs = require('fs');
 var projects;
@@ -44,6 +45,139 @@ describe('project setting', function() {
 		it('not remove already projects', function(){
 			store.updateProjects(projects, 'undefined');
 			assert.equal(store.Projects().length, 2);
+		});
+	});
+
+	describe('set users', function(){
+		var users,
+			user,
+			data = '{"memberships" : [{"user" : {"id" : 1, "name" : "test"}}]}';
+
+		beforeEach(function(){
+			users = sinon.stub(store, 'Users', function(){
+				return user;
+			});
+		});
+
+		afterEach(function(){
+			store.setUsers('{"memberships" : []}', 1);
+		});
+
+		it('set users when user not contained in user list', function(){
+			user = undefined;
+			store.setUsers(data, 1);
+			users.restore();
+
+			assert.equal(store.Users(1).name, 'test');
+		});
+
+		it('set users when user contained in user list', function(){
+			user = { id : 1, name : 'test2' };
+			store.setUsers(data, 1);
+			users.restore();
+
+			assert.equal(store.Users(1), user);
+		});
+	});
+
+	describe('set issues', function(){
+		var data = '{ "issues" : [{ "id" : 1, "project" : { "id" : 1}, "tracker" : {}, "status" : {}}]}';
+
+		afterEach(function(){
+			store.setIssues('{"issues": []}', 1);
+		});
+
+		it('issues contained in the project', function(){
+			store.setIssues(data, 1);
+
+			assert.equal(store.Issues(1).length, 1);
+			assert.equal(store.Issues(1)[0].id, 1);
+		});
+
+		it('issues not contained in the project', function(){
+			store.setIssues(data, 2);
+
+			assert.equal(store.Issues(1).length, 0);
+		});
+	});
+
+	describe('update issues', function(){
+		var data = '{ "issues" : [{ "id" : 1, "subject" : "test2", "project" : { "id" : 1}, "tracker" : {}, "status" : {}}]}';
+
+		beforeEach(function(){
+			store.setIssues('{ "issues" : [{ "id" : 1, "subject" : "test", "project" : { "id" : 1}, "tracker" : {}, "status" : {}}]}', 1);
+		});
+
+		afterEach(function(){
+			store.setIssues('{"issues": []}', 1);
+		});
+
+		it('issues contained in the project', function(){
+			store.updateIssues(data, 1);
+
+			assert.equal(store.Issues(1).length, 1);
+			assert.equal(store.Issues(1)[0].subject, 'test2');
+		});
+
+		it('issues not contained in the project', function(){
+			store.setIssues(data, 2);
+
+			assert.equal(store.Issues(1).length, 1);
+		});
+	});
+
+	describe('get users', function(){
+		beforeEach(function(){
+			store.setUsers('{"memberships" : [{"user" : {"id" : 1, "name" : "test"}}]}', 1);
+		});
+
+		afterEach(function(){
+			store.setUsers('{"memberships" : []}', 1);
+		});
+
+		it('users containd', function(){
+			assert.equal(store.Users(1).name, 'test');
+		});
+
+		it('users not containd', function(){
+			assert.equal(store.Users(2), undefined);
+		});
+	});
+
+	describe('get issues', function(){
+		afterEach(function(){
+			store.setIssues('{"issues": []}', 1);
+		});
+
+		it('project not contains issues', function(){
+			assert.equal(store.Issues(1).length, 0);
+		});
+
+		it('project contains issues', function(){
+			store.setIssues('{ "issues" : [{ "id" : 1, "subject" : "test", "project" : { "id" : 1}, "tracker" : {}, "status" : {}}]}', 1);
+			assert.equal(store.Issues(1).length, 1);
+			assert.equal(store.Issues(1)[0].subject, 'test');
+		});
+
+		it('project contains issues with filter', function(){
+			var map = new Map();
+			map.set(1, 1);
+			store.setIssues('{ "issues" : [{ "id" : 1, "subject" : "test", "project" : { "id" : 1}, "tracker" : { "id" : 1}, "status" : { "id" : 1}}, { "id" : 2, "subject" : "test2", "project" : { "id" : 1}, "tracker" : { "id" : 2}, "status" : { "id" : 2}}]}', 1);
+			var trackers = sinon.stub(store, 'Trackers', function(){
+				return map;
+			});
+			var statuses = sinon.stub(store, 'IssueStatuses', function(){
+				return map;
+			});
+
+			store.updateSelectedTracker(1);
+			store.updateSelectedStatus(1);
+
+			assert.equal(store.Issues(1).length, 1);
+			assert.equal(store.Issues(1)[0].subject, 'test');
+
+			trackers.restore();
+			statuses.restore();
 		});
 	});
 });
