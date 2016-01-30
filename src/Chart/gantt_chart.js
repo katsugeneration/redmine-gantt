@@ -10,10 +10,10 @@
 		propTypes : {
 			height : React.PropTypes.number.isRequired,
 			width : React.PropTypes.number.isRequired,
-			startDate : React.PropTypes.instanceOf(ExtendsDate).isRequired,
-			dueDate : React.PropTypes.instanceOf(ExtendsDate).isRequired,
 			type : React.PropTypes.oneOf(['Date', 'Week']).isRequired,
-			data : React.PropTypes.arrayOf(React.PropTypes.instanceOf(GanttData)).isRequired,
+			projects : React.PropTypes.array.isRequired,
+			issues : React.PropTypes.func.isRequired,
+			users : React.PropTypes.func.isRequired,
 			style : React.PropTypes.object
 		},
 		getDefaulProps : function()
@@ -21,17 +21,55 @@
 			return {
 				height : 0,
 				width : 0,
-				startDate : new ExtendsDate(),
-				dueDate : new ExtendsDate(),
 				type : 'Date',
-				data : [],
 				style : {}
 			};
 		},
+		getInitialState: function()
+		{
+			return {
+				startDate : new ExtendsDate(),
+				dueDate : new ExtendsDate(),
+				data : []
+			};
+		},
+		componentWillReceiveProps : function(nextProps)
+		{
+			var data = []; // chart data
+			var startDate = new ExtendsDate(8640000000000000); // chart start date
+			var dueDate = new ExtendsDate(Number.MIN_VALUE); // chart end date
+
+			nextProps.projects.some(function(project){
+				// project is
+				var projectData = new GanttData();
+				projectData.startDate = new ExtendsDate(ExtendsDate.now());
+				projectData.dueDate = new ExtendsDate(undefined);
+				projectData.key = project.name;
+				data.push(projectData);
+
+				data = data.concat(nextProps.issues(project.id).map(function(issue){
+					var ganttData = new GanttData();
+					ganttData.startDate = new ExtendsDate(ExtendsDate.parse(issue.startDate));
+					ganttData.dueDate = new ExtendsDate(ExtendsDate.parse(issue.dueDate));
+					if (nextProps.users(issue.assignedId) != undefined)
+						ganttData.color = nextProps.users(issue.assignedId).color;
+					ganttData.key = issue.id + '-' + issue.updated;
+
+					// update chart date
+					if (startDate > ganttData.startDate) startDate = ganttData.startDate;
+					if (dueDate < ganttData.dueDate) dueDate = ganttData.dueDate;
+
+					return ganttData;
+				}));
+			});
+
+			if (dueDate < startDate) dueDate = new ExtendsDate(undefined);
+			this.setState({startDate : startDate, dueDate : dueDate, data : data});
+		},
 		render : function()
 		{
-			var startDate = new ExtendsDate(this.props.startDate.toString());
-			var dueDate = new ExtendsDate(this.props.dueDate.toString());
+			var startDate = new ExtendsDate(this.state.startDate.toString());
+			var dueDate = new ExtendsDate(this.state.dueDate.toString());
 
 			if (dueDate == 'Invalid Date') return(<div style={this.props.style}></div>);
 
@@ -42,7 +80,7 @@
 			dueDate.addDate((13 - dueDate.getDay()) % 7);
 
 			var chartWidth = (new ExtendsDate(dueDate.getTime() - startDate.getTime()).getTotalDate() + 1) * this.props.width + 5;
-			var barcharts = this.props.data.map(function(item, index){
+			var barcharts = this.state.data.map(function(item, index){
 				var length = (item.dueDate == 'Invalid Date') ? 0 : new ExtendsDate(item.dueDate.getTime() - item.startDate.getTime()).getTotalDate() + 1;
 				var start = new ExtendsDate(item.startDate.getTime() - startDate.getTime()).getTotalDate();
 				return ( <BarChart key={item.key} startPos={start * this.props.width} barHeight={this.props.height} barWidth={length * this.props.width} index={index + 2} color={item.color}/> );
@@ -50,8 +88,8 @@
 
 			return(
 				<div style={this.props.style}>
-				<svg width={chartWidth} height={this.props.height * (this.props.data.length + 2)}>
-				<CalendarGrid {...this.props} startDate={startDate} dueDate={dueDate} length={this.props.data.length}></CalendarGrid>
+				<svg width={chartWidth} height={this.props.height * (this.state.data.length + 2)}>
+				<CalendarGrid {...this.props} startDate={startDate} dueDate={dueDate} length={this.state.data.length}></CalendarGrid>
 				{barcharts}
 				</svg>
 				</div>
@@ -240,6 +278,4 @@
 		this.dueDate = new ExtendsDate();
 		this.color = DEFAULT_BARCHART_COLOR;
 	}
-
-	exports.GanttData = GanttData;
 })(this);

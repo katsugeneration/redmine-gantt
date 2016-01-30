@@ -12,9 +12,6 @@ const ProjectList = require('./project_table.js').ProjectList;
 const UpdateDialog = require('./update_dialog.js');
 const ItemsSelectField = require('./items_select_field.js');
 
-const GanttData = require('../Chart/gantt_chart.js').GanttData;
-const ExtendsDate = require('../Extends/extend_date.js').ExtendsDate;
-
 const SelectField = require('material-ui').SelectField;
 const MenuItem = require('material-ui').MenuItem;
 
@@ -22,8 +19,6 @@ var Main = React.createClass({
 	getInitialState : function()
 	{
 		return{
-			startDate : new ExtendsDate(),
-			dueDate : new ExtendsDate(undefined),
 			chartType : 'Week',
 			chartDateWidth : 10,
 			items : [],
@@ -57,17 +52,17 @@ var Main = React.createClass({
 	{
 		return(
 			<div style={{'padding' : 10}}>
-			<SearchField search={action.loadProjects}/>
-			<div><SelectField value={this.state.chartType} onChange={this._onchartTypeChanged} >
-				<MenuItem value='Date' primaryText='Date' />
-				<MenuItem value='Week' primaryText='Week' />
-			</SelectField></div>
-			<div><ItemsSelectField items={store.Trackers()} selectedValue={this.state.selectedTracker} onValueChanged={this._trackerChanged}/>
-			<ItemsSelectField items={store.IssueStatuses()} selectedValue={this.state.selectedStatus} onValueChanged={this._issueStatusChanged}/></div>
-			<ProjectList style={{float: 'left'}} projects={store.Projects()} issues={store.Issues} issueStatuses={store.IssueStatuses()} trackers={store.Trackers()} updateIssueWindowState={action.updateIssueWindowState} deleteIssue={action.deleteIssue}/>
-			<GanttChart height={51} width={this.state.chartDateWidth} type={this.state.chartType} startDate={this.state.startDate} dueDate={this.state.dueDate} style={{overflow: 'scroll'}} data={this.state.items}/>
-			<AddIssueWindow isOpen={this.state.isIssuwWindowOpen} type={this.state.modalType} relatedObj={this.state.modalObject} onClosed={this._issueWindowClosed}/>
-			<UpdateDialog isOpen={this.state.isUpdateDialogOpen}/>
+				<SearchField search={action.loadProjects}/>
+				<div><SelectField value={this.state.chartType} onChange={this._onchartTypeChanged} >
+					<MenuItem value='Date' primaryText='Date' />
+					<MenuItem value='Week' primaryText='Week' />
+				</SelectField></div>
+				<div><ItemsSelectField items={store.Trackers()} selectedValue={this.state.selectedTracker} onValueChanged={this._trackerChanged}/>
+				<ItemsSelectField items={store.IssueStatuses()} selectedValue={this.state.selectedStatus} onValueChanged={this._issueStatusChanged}/></div>
+				<ProjectList style={{float: 'left'}} projects={store.Projects()} issues={store.Issues} issueStatuses={store.IssueStatuses()} trackers={store.Trackers()} updateIssueWindowState={action.updateIssueWindowState} deleteIssue={action.deleteIssue}/>
+				<GanttChart height={51} width={this.state.chartDateWidth} type={this.state.chartType} projects={store.Projects()} issues={store.Issues} users={store.Users} style={{overflow: 'scroll'}}/>
+				<AddIssueWindow isOpen={this.state.isIssuwWindowOpen} type={this.state.modalType} relatedObj={this.state.modalObject} onClosed={this._issueWindowClosed}/>
+				<UpdateDialog isOpen={this.state.isUpdateDialogOpen}/>
 			</div>
 		);
 	},
@@ -91,36 +86,7 @@ var Main = React.createClass({
 	},
 	_onDataChanged : function()
 	{
-		var data = []; // chart data
-		var startDate = new ExtendsDate(8640000000000000); // chart start date
-		var dueDate = new ExtendsDate(Number.MIN_VALUE); // chart end date
-
-		store.Projects().some(function(project){
-			// project is
-			var projectData = new GanttData();
-			projectData.startDate = new ExtendsDate(ExtendsDate.now());
-			projectData.dueDate = new ExtendsDate(undefined);
-			projectData.key = project.name;
-			data.push(projectData);
-
-			data = data.concat(store.Issues(project.id).map(function(issue){
-				var ganttData = new GanttData();
-				ganttData.startDate = new ExtendsDate(ExtendsDate.parse(issue.startDate));
-				ganttData.dueDate = new ExtendsDate(ExtendsDate.parse(issue.dueDate));
-				if (store.Users(issue.assignedId) != undefined)
-					ganttData.color = store.Users(issue.assignedId).color;
-				ganttData.key = issue.id + '-' + issue.updated;
-
-				// update chart date
-				if (startDate > ganttData.startDate) startDate = ganttData.startDate;
-				if (dueDate < ganttData.dueDate) dueDate = ganttData.dueDate;
-
-				return ganttData;
-			}));
-		});
-
-		if (dueDate < startDate) dueDate = new ExtendsDate(undefined);
-		this.setState({startDate : startDate, dueDate : dueDate, items : data});
+		this.forceUpdate();
 	},
 	_trackerChanged : function(event, index, value)
 	{
