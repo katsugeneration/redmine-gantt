@@ -59,7 +59,7 @@ var Main = React.createClass({
 				</SelectField></div>
 				<div><ItemsSelectField items={store.Trackers()} selectedValue={this.state.selectedTracker} onValueChanged={this._trackerChanged}/>
 				<ItemsSelectField items={store.IssueStatuses()} selectedValue={this.state.selectedStatus} onValueChanged={this._issueStatusChanged}/></div>
-				<ProjectList style={{float: 'left'}} projects={store.Projects()} issues={store.Issues} issueStatuses={store.IssueStatuses()} trackers={store.Trackers()} updateIssueWindowState={action.updateIssueWindowState} deleteIssue={action.deleteIssue}/>
+				<ProjectList style={{float: 'left', 'width': 500, 'paddingTop' : 8}} projects={store.Projects()} issues={store.Issues} issueStatuses={store.IssueStatuses()} trackers={store.Trackers()} updateIssueWindowState={action.updateIssueWindowState} deleteIssue={action.deleteIssue} toggleProject={this._toggleProject}/>
 				<GanttChart height={51} width={this.state.chartDateWidth} type={this.state.chartType} projects={store.Projects()} issues={store.Issues} users={store.Users} style={{overflow: 'scroll'}}/>
 				<AddIssueWindow isOpen={this.state.isIssuwWindowOpen} type={this.state.modalType} relatedObj={this.state.modalObject} onClosed={this._issueWindowClosed}/>
 				<UpdateDialog isOpen={this.state.isUpdateDialogOpen}/>
@@ -110,6 +110,17 @@ var Main = React.createClass({
 	_issueWindowClosed : function()
 	{
 		this.setState({ isIssuwWindowOpen : false });
+	},
+	_toggleProject : function(projectId)
+	{
+		store.Projects().some(function(project){
+			if (project.id == projectId)
+			{
+				project.expand = !project.expand;
+				return true;
+			}
+		});
+		this._onDataChanged();
 	}
 });
 

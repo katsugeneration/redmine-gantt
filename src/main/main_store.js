@@ -43,6 +43,7 @@
 			if(callback !== undefined && typeof callback == 'function')
 				callback(project);
 
+			project.expand = true;
 			project.parent_id = (project.parent == undefined) ? 0 : project.parent.id;
 			_projects.push(project);
 		});

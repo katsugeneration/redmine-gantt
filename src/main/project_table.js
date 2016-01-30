@@ -20,7 +20,8 @@
 			issueStatuses : React.PropTypes.instanceOf(Map).isRequired,
 			trackers : React.PropTypes.instanceOf(Map).isRequired,
 			updateIssueWindowState : React.PropTypes.func.isRequired,
-			deleteIssue : React.PropTypes.func.isRequired
+			deleteIssue : React.PropTypes.func.isRequired,
+			toggleProject : React.PropTypes.func
 		},
 		getDefaulProps : function()
 		{
@@ -31,7 +32,8 @@
 				issueStatuses : new Map(),
 				trackers : new Map(),
 				updateIssueWindowState : () => {},
-				deleteIssue : () => {}
+				deleteIssue : () => {},
+				toggleProject : () => {}
 			};
 		},
 		getInitialState: function()
@@ -53,10 +55,12 @@
 				data.push(
 					<TableRow key={project.name} selected={row == 1}>
 						<TableRowColumn>{project.name}</TableRowColumn>
-						<TableRowColumn></TableRowColumn>
+						<TableRowColumn>{project.expand ? '-' : '+'}</TableRowColumn>
 					</TableRow>
 				);
 				row--;
+
+				if (!project.expand) return false;
 
 				data = data.concat(_this.props.issues(project.id).map(function(issue){
 					var ret = (
@@ -75,6 +79,42 @@
 
 			this.setState({items : data});
 		},
+		_cellClick : function(rowNumber, columnIndex)
+		{
+			var item = this._getRowItem(rowNumber);
+			if (item.projectId == undefined && columnIndex == 2)
+			{
+				// item is a project
+				this.props.toggleProject(item.id);
+			}
+		},
+		_getRowItem : function(rowNumber)
+		{
+			rowNumber++;
+			var _this = this,
+				object = undefined;
+
+			this.props.projects.some(function(project){
+				if (rowNumber == 1)
+				{
+					object = project;
+					return true;
+				}
+				rowNumber--;
+
+				// no expand project's issues are not showed
+				if (!project.expand) return false;
+
+				if (rowNumber < _this.props.issues(project.id).length)
+				{
+					object = _this.props.issues(project.id)[rowNumber - 1];
+					return true;
+				}
+				rowNumber -= _this.props.issues(project.id).length;
+			});
+
+			return object;
+		},
 		_onRowSelection : function(selectedRows)
 		{
 			if (selectedRows.length == 0)
@@ -89,29 +129,11 @@
 				return;
 			}
 
-			var row = selectedRows[0] + 1;
-			var type = '';
-			var object = {};
-			var _this = this;
+			var row = selectedRows[0];
+			var type = 'Add';
+			var object = this._getRowItem(row);
 
-			this.props.projects.some(function(project){
-				if (row == 1)
-				{
-					type = 'Add';
-					object = project;
-					return true;
-				}
-
-				row--;
-				if (row < _this.props.issues(project.id).length)
-				{
-					type = 'Update';
-					object = _this.props.issues(project.id)[row - 1];
-					return true;
-				}
-
-				row -= _this.props.issues(project.id).length;
-			});
+			if (object.projectId != undefined) type = 'Update';
 
 			this.state.buttonType = type;
 			this.state.buttonRelatedObject = object;
@@ -134,13 +156,13 @@
 		render : function()
 		{
 			return (
-				<div style={Object.assign(this.props.style, {'width': 500, 'paddingTop' : 8})}>
+				<div style={this.props.style}>
 				<FlatButton onClick={this._onButtonClick} disabled={this.state.buttonType != 'Add'} label='Add' />
 				<FlatButton onClick={this._onButtonClick} disabled={this.state.buttonType != 'Update'} label='Update' />
 				<FlatButton onClick={this._onDeleteButtonClick} disabled={this.state.buttonType != 'Update'} label='Delete' />
-				<Table selectable={true} onRowSelection={this._onRowSelection}>
-					<TableHeader>
-						<TableRow>
+				<Table selectable={true} onRowSelection={this._onRowSelection} onCellClick={this._cellClick}>
+					<TableHeader >
+						<TableRow height={'10'}>
 						<TableHeaderColumn tooltip='subject'>Subject</TableHeaderColumn>
 						<TableHeaderColumn tooltip='status'>Status</TableHeaderColumn>
 						<TableHeaderColumn tooltip='task category'>Tracker</TableHeaderColumn>

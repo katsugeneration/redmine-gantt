@@ -47,6 +47,8 @@
 				projectData.key = project.name;
 				data.push(projectData);
 
+				if (!project.expand) return false;
+
 				data = data.concat(nextProps.issues(project.id).map(function(issue){
 					var ganttData = new GanttData();
 					ganttData.startDate = new ExtendsDate(ExtendsDate.parse(issue.startDate));
