@@ -195,7 +195,7 @@ describe('action test', function(){
 		});
 
 		it('update issue window state', function(){
-			action.updateIssueWindowState(true, "Update", {});
+			action.updateIssueWindowState(true, 'Update', {});
 
 			sinon.assert.calledWith(dispatch, sinon.match({ actionType : 'issue-window-state-update' }));
 		});
@@ -223,13 +223,13 @@ describe('action test', function(){
 		});
 
 		it('update selected tracker', function(){
-			action.updateSelectedTracker("Update");
+			action.updateSelectedTracker('Update');
 
 			sinon.assert.calledWith(dispatch, sinon.match({ actionType : 'selected-tracker-update' }));
 		});
 
 		it('update selected status', function(){
-			action.updateSelectedStatus("Update");
+			action.updateSelectedStatus('Update');
 
 			sinon.assert.calledWith(dispatch, sinon.match({ actionType : 'selected-status-update' }));
 		});

@@ -1,6 +1,5 @@
 var assert = require('assert');
 var sinon = require('sinon');
-var action = require('../dist/main/main_action.js');
 
 var SearchField = require('../dist/main/search_field.js').SearchField;
 var TextField = require('material-ui').TextField;
@@ -9,11 +8,13 @@ var React = require('react');
 var ReactTestUtils = require('react-addons-test-utils');
 
 describe('search field test', function(){
-	var dom,
+	var spy,
+		dom,
 		textField;
 
 	beforeEach(function(){
-		dom = ReactTestUtils.renderIntoDocument(React.createElement(SearchField));
+		spy = sinon.spy();
+		dom = ReactTestUtils.renderIntoDocument(React.createElement(SearchField, {search : spy}));
 		textField = ReactTestUtils.findRenderedComponentWithType(dom, TextField);
 	});
 
@@ -23,18 +24,12 @@ describe('search field test', function(){
 	});
 
 	it('press enter key', function(){
-		var loadProjects = sinon.spy(action, 'loadProjects');
-
 		textField.props.onKeyPress({which : 13});
-		assert(loadProjects.called);
-		loadProjects.restore();
+		assert(spy.called);
 	});
 
 	it('press no enter key', function(){
-		var loadProjects = sinon.spy(action, 'loadProjects');
-
 		textField.props.onKeyPress({which : 3});
-		assert(!loadProjects.called);
-		loadProjects.restore();
+		assert(!spy.called);
 	});
 });

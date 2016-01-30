@@ -3,11 +3,19 @@
 
 	const React = require('react');
 
-	const action = require('./main_action.js');
 	const FlatButton = require('material-ui').FlatButton;
 	const TextField = require('material-ui').TextField;
 
 	exports.SearchField = React.createClass({
+		PropTypes : {
+			search : React.PropTypes.func.isRequired
+		},
+		getDefaulProps : function()
+		{
+			return {
+				search : () => {}
+			};
+		},
 		getInitialState : function()
 		{
 			return {
@@ -20,7 +28,7 @@
 		},
 		_startSearch : function()
 		{
-			action.loadProjects(this.state.textValue);
+			this.props.search(this.state.textValue);
 		},
 		_keyPressed : function(e)
 		{

@@ -139,11 +139,11 @@
 			return (
 				<Modal isOpen={this.state.isOpen} onRequestClose={this._onClose} style={{'content' : {'position' : 'absolute', 'width': '300', 'marginLeft' : 'auto', 'marginRight' : 'auto'}}}>
 					<div><TextField placeholder='subject' value={this.state.issue.subject} onChange={this._onSubjectChanged} /></div>
-					<div><label>tracker:<SelectField value={this.state.issue.trackerId} onChange={this._trackerChanged}>{trackerList}</SelectField></label></div>
-					<div><label>status:   <SelectField value={this.state.issue.statusId} onChange={this._statusChanged}>{statusList}</SelectField></label></div>
-					<div><label>start date:<DatePicker mode='landscape' formatDate={this._formatDate} maxDate={new Date(this.state.issue.dueDate)} value={new Date(this.state.issue.startDate)} onChange={this._startDateChanged} /></label></div>
-					<div><label>due date:<DatePicker mode='landscape' formatDate={this._formatDate} minDate={new Date(this.state.issue.startDate)} value={new Date(this.state.issue.dueDate)} onChange={this._dueDateChanged} /></label></div>
-					<div><label>assigned to:<SelectField value={this.state.issue.assignedId} onChange={this._assignedIdChanged}>{userList}</SelectField></label></div>
+					<div>tracker:<SelectField value={this.state.issue.trackerId} onChange={this._trackerChanged}>{trackerList}</SelectField></div>
+					<div>status:   <SelectField value={this.state.issue.statusId} onChange={this._statusChanged}>{statusList}</SelectField></div>
+					<div>start date:<DatePicker mode='landscape' formatDate={this._formatDate} maxDate={new Date(this.state.issue.dueDate)} value={new Date(this.state.issue.startDate)} onChange={this._startDateChanged} /></div>
+					<div>due date:<DatePicker mode='landscape' formatDate={this._formatDate} minDate={new Date(this.state.issue.startDate)} value={new Date(this.state.issue.dueDate)} onChange={this._dueDateChanged} /></div>
+					<div>assigned to:<SelectField value={this.state.issue.assignedId} onChange={this._assignedIdChanged}>{userList}</SelectField></div>
 					<div><FlatButton onClick={this.state.mainButtonCallback} label={this.state.mainButtonLabel} secondary={true}/>
 					<FlatButton onClick={this._onClose} label='Cancel' /></div>
 				</Modal>

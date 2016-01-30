@@ -80,7 +80,7 @@ exports.writeData = function(method, path, data, callback)
 	}, function(res){
 		res.setEncoding('utf8');
 		if (res.statusCode == 200 || res.statusCode == 201)
-		callback();
+			callback();
 	});
 
 	req.write(writeData);
@@ -97,7 +97,7 @@ exports.loadProjects = function(target)
 {
 	if (target == '') return;
 
-	var _this = this;
+	var _this = exports;
 	function recursion (offset, limit)
 	{
 		_this.loadData('/projects.json?offset=' + offset + '&limit=' + limit, function(data){
@@ -105,17 +105,17 @@ exports.loadProjects = function(target)
 			var obj = JSON.parse(data);
 			if (obj.total_count > obj.offset + obj.limit) recursion(obj.offset + obj.limit, obj.limit);
 			if (obj.offset == 0)
-			dispatcher.dispatch({
-				actionType : 'projects-get',
-				data : data,
-				target : target
-			});
+				dispatcher.dispatch({
+					actionType : 'projects-get',
+					data : data,
+					target : target
+				});
 			if (obj.offset != 0)
-			dispatcher.dispatch({
-				actionType : 'projects-update',
-				data : data,
-				target : target
-			});
+				dispatcher.dispatch({
+					actionType : 'projects-update',
+					data : data,
+					target : target
+				});
 		});
 	}
 
@@ -127,7 +127,7 @@ exports.loadProjects = function(target)
 **/
 exports.loadUsers = function(id)
 {
-	this.loadData('/projects/' + id + '/memberships.json', function(data){
+	exports.loadData('/projects/' + id + '/memberships.json', function(data){
 		dispatcher.dispatch({
 			actionType : 'users-get',
 			data : data,
@@ -141,7 +141,7 @@ exports.loadUsers = function(id)
 **/
 exports.loadIssues =  function(id)
 {
-	var _this = this;
+	var _this = exports;
 	function recursion (offset, limit)
 	{
 		_this.loadData('/issues.json?offset=' + offset + '&limit=' + limit + '&project_id=' + id, function(data){
@@ -149,17 +149,17 @@ exports.loadIssues =  function(id)
 			var obj = JSON.parse(data);
 			if (obj.total_count > obj.offset + obj.limit) recursion(obj.offset + obj.limit, obj.limit);
 			if (obj.offset == 0)
-			dispatcher.dispatch({
-				actionType : 'issues-get',
-				data : data,
-				id : id
-			});
+				dispatcher.dispatch({
+					actionType : 'issues-get',
+					data : data,
+					id : id
+				});
 			if (obj.offset != 0)
-			dispatcher.dispatch({
-				actionType : 'issues-update',
-				data : data,
-				id : id
-			});
+				dispatcher.dispatch({
+					actionType : 'issues-update',
+					data : data,
+					id : id
+				});
 		});
 	}
 
@@ -168,7 +168,7 @@ exports.loadIssues =  function(id)
 
 exports.deleteIssue = function(issue)
 {
-	var _this = this;
+	var _this = exports;
 	exports.deleteData('/issues/' + issue.id + '.json', function(){
 		_this.loadIssues(issue.projectId);
 	});
@@ -179,7 +179,7 @@ exports.deleteIssue = function(issue)
 **/
 exports.loadIssueStatuses = function()
 {
-	this.loadData('/issue_statuses.json', function(data){
+	exports.loadData('/issue_statuses.json', function(data){
 		dispatcher.dispatch({
 			actionType : 'issue-statuses-get',
 			data : data
@@ -192,7 +192,7 @@ exports.loadIssueStatuses = function()
 **/
 exports.loadTrackers = function()
 {
-	this.loadData('/trackers.json', function(data){
+	exports.loadData('/trackers.json', function(data){
 		dispatcher.dispatch({
 			actionType : 'trackers-get',
 			data : data
@@ -212,12 +212,12 @@ exports.updateIssueWindowState = function(isOpen, modalType, modalObject)
 
 exports.postNewIssue = function(data, projectId)
 {
-	this.writeData('POST', '/issues.json', data, function(){ exports.loadIssues(projectId); } );
+	exports.writeData('POST', '/issues.json', data, function(){ exports.loadIssues(projectId); } );
 };
 
 exports.updateIssue = function(issueId, data, projectId)
 {
-	this.writeData('PUT', '/issues/' + issueId + '.json', data, function(){ exports.loadIssues(projectId); } );
+	exports.writeData('PUT', '/issues/' + issueId + '.json', data, function(){ exports.loadIssues(projectId); } );
 };
 
 exports.updateSelectedTracker = function(newValue)
