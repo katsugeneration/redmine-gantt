@@ -53,7 +53,7 @@
 
 			this.props.projects.some(function(project){
 				data.push(
-					<TableRow key={project.name} selected={row == 1}>
+					<TableRow key={project.name} selected={row == 1} style={{heoght : 10}}>
 						<TableRowColumn>{project.name}</TableRowColumn>
 						<TableRowColumn>{project.expand ? '-' : '+'}</TableRowColumn>
 					</TableRow>
@@ -79,7 +79,7 @@
 
 			this.setState({items : data});
 		},
-		_cellClick : function(rowNumber, columnIndex)
+		_onCellClick : function(rowNumber, columnIndex)
 		{
 			var item = this._getRowItem(rowNumber);
 			if (item.projectId == undefined && columnIndex == 2)
@@ -105,7 +105,7 @@
 				// no expand project's issues are not showed
 				if (!project.expand) return false;
 
-				if (rowNumber < _this.props.issues(project.id).length)
+				if (rowNumber <= _this.props.issues(project.id).length)
 				{
 					object = _this.props.issues(project.id)[rowNumber - 1];
 					return true;
@@ -132,7 +132,6 @@
 			var row = selectedRows[0];
 			var type = 'Add';
 			var object = this._getRowItem(row);
-
 			if (object.projectId != undefined) type = 'Update';
 
 			this.state.buttonType = type;
@@ -160,9 +159,9 @@
 				<FlatButton onClick={this._onButtonClick} disabled={this.state.buttonType != 'Add'} label='Add' />
 				<FlatButton onClick={this._onButtonClick} disabled={this.state.buttonType != 'Update'} label='Update' />
 				<FlatButton onClick={this._onDeleteButtonClick} disabled={this.state.buttonType != 'Update'} label='Delete' />
-				<Table selectable={true} onRowSelection={this._onRowSelection} onCellClick={this._cellClick}>
+				<Table selectable={true} onRowSelection={this._onRowSelection} onCellClick={this._onCellClick}>
 					<TableHeader >
-						<TableRow height={'10'}>
+						<TableRow>
 						<TableHeaderColumn tooltip='subject'>Subject</TableHeaderColumn>
 						<TableHeaderColumn tooltip='status'>Status</TableHeaderColumn>
 						<TableHeaderColumn tooltip='task category'>Tracker</TableHeaderColumn>

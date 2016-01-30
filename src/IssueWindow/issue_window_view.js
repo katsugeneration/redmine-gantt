@@ -57,7 +57,7 @@
 			}
 			else if(type == 'Update')
 			{
-				issue = object;
+				Issue.copyTo(issue, object);
 				mainButtonLabel = 'Update';
 				mainButtonCallback = this._updateIssue;
 			}
@@ -136,13 +136,16 @@
 				userList.push( <MenuItem key={user.id} value={user.id} primaryText={user.name} /> );
 			});
 
+			var startDate = this.state.issue.startDate == undefined ? undefined : new Date(this.state.issue.startDate);
+			var dueDate = this.state.issue.dueDate == undefined ? undefined : new Date(this.state.issue.dueDate);
+
 			return (
 				<Modal isOpen={this.state.isOpen} onRequestClose={this._onClose} style={{'content' : {'position' : 'absolute', 'width': '300', 'marginLeft' : 'auto', 'marginRight' : 'auto'}}}>
 					<div><TextField placeholder='subject' value={this.state.issue.subject} onChange={this._onSubjectChanged} /></div>
 					<div>tracker:<SelectField value={this.state.issue.trackerId} onChange={this._trackerChanged}>{trackerList}</SelectField></div>
 					<div>status:   <SelectField value={this.state.issue.statusId} onChange={this._statusChanged}>{statusList}</SelectField></div>
-					<div>start date:<DatePicker mode='landscape' formatDate={this._formatDate} maxDate={new Date(this.state.issue.dueDate)} value={new Date(this.state.issue.startDate)} onChange={this._startDateChanged} /></div>
-					<div>due date:<DatePicker mode='landscape' formatDate={this._formatDate} minDate={new Date(this.state.issue.startDate)} value={new Date(this.state.issue.dueDate)} onChange={this._dueDateChanged} /></div>
+					<div>start date:<DatePicker mode='landscape' formatDate={this._formatDate} maxDate={dueDate} value={startDate} onChange={this._startDateChanged} /></div>
+					<div>due date:<DatePicker mode='landscape' formatDate={this._formatDate} minDate={startDate} value={dueDate} onChange={this._dueDateChanged} /></div>
 					<div>assigned to:<SelectField value={this.state.issue.assignedId} onChange={this._assignedIdChanged}>{userList}</SelectField></div>
 					<div><FlatButton onClick={this.state.mainButtonCallback} label={this.state.mainButtonLabel} secondary={true}/>
 					<FlatButton onClick={this._onClose} label='Cancel' /></div>
