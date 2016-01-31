@@ -217,16 +217,6 @@ exports.loadTrackers = function()
 	});
 };
 
-exports.updateIssueWindowState = function(isOpen, modalType, modalObject)
-{
-	dispatcher.dispatch({
-		actionType : 'issue-window-state-update',
-		isOpen : isOpen,
-		modalType : modalType,
-		modalObject : modalObject
-	});
-};
-
 exports.postNewIssue = function(issue, projectId)
 {
 	exports.writeData('POST', '/issues.json', issue.toJSON(), function(data){
@@ -248,38 +238,4 @@ exports.updateIssue = function(issueId, issue, projectId)
 			projectId : projectId
 		});
 	} );
-};
-
-exports.updateSelectedTracker = function(newValue)
-{
-	dispatcher.dispatch({
-		actionType : 'selected-tracker-update',
-		tracker : newValue
-	});
-};
-
-exports.updateSelectedStatus = function(newValue)
-{
-	dispatcher.dispatch({
-		actionType : 'selected-status-update',
-		status : newValue
-	});
-};
-
-exports.toggelProject = function(projectId)
-{
-	dispatcher.dispatch({
-		actionType : 'change-project-toggle',
-		id : projectId
-	});
-};
-
-exports.updateIssueDate = function(issueId, value, type)
-{
-	dispatcher.dispatch({
-		actionType : 'update-issue-date',
-		id : issueId,
-		value : value,
-		type : type
-	});
 };

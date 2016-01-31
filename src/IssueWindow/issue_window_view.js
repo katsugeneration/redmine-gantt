@@ -3,7 +3,7 @@
 
 	const React = require('react');
 	const Modal = require('react-modal');
-	const action = require('../main/main_action.js');
+	const action = require('../main/network_action.js');
 	const store = require('../main/main_store.js');
 	const Issue = require('../Data/issue.js').Issue;
 	const ExtendsDate = require('../Extends/extend_date.js').ExtendsDate;

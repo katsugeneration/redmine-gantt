@@ -3,7 +3,8 @@
 const React = require('react');
 const reactDOM = require('react-dom');
 const store = require('./main_store.js');
-const action = require('./main_action.js');
+const networkAction = require('./network_action.js');
+const uiAction = require('./ui_action.js');
 
 const SearchField = require('./search_field.js').SearchField;
 const AddIssueWindow = require('../IssueWindow/issue_window_view.js').AddIssueWindow;
@@ -39,8 +40,8 @@ var Main = React.createClass({
 		store.addListener('users', this._onDataChanged);
 		store.addListener('issues', this._onDataChanged);
 		store.addListener('issue-window-state', this._onIssueWindowStateChanged);
-		action.loadIssueStatuses();
-		action.loadTrackers();
+		networkAction.loadIssueStatuses();
+		networkAction.loadTrackers();
 	},
 	componentWillUnmount : function()
 	{
@@ -54,15 +55,15 @@ var Main = React.createClass({
 	{
 		return(
 			<div style={{'padding' : 10}}>
-				<SearchField search={action.loadProjects}/>
+				<SearchField search={networkAction.loadProjects}/>
 				<div><SelectField value={this.state.chartType} onChange={this._onchartTypeChanged} >
 					<MenuItem value='Date' primaryText='Date' />
 					<MenuItem value='Week' primaryText='Week' />
 				</SelectField></div>
 				<div><ItemsSelectField items={store.Trackers()} selectedValue={this.state.selectedTracker} onValueChanged={this._trackerChanged}/>
 				<ItemsSelectField items={store.IssueStatuses()} selectedValue={this.state.selectedStatus} onValueChanged={this._issueStatusChanged}/></div>
-				<ProjectList style={{float: 'left', 'width': 500, 'paddingTop' : 8}} rowHeight={ROW_HEIGHT - 3} projects={store.Projects()} issues={store.Issues} issueStatuses={store.IssueStatuses()} trackers={store.Trackers()} updateIssueWindowState={action.updateIssueWindowState} deleteIssue={action.deleteIssue} toggleProject={this._toggleProject}/>
-				<GanttChart height={ROW_HEIGHT} width={this.state.chartDateWidth} type={this.state.chartType} projects={store.Projects()} issues={store.Issues} users={store.Users} updateIssueDate={action.updateIssueDate} updateEnd={action.updateIssue} style={{overflow: 'scroll', 'paddingTop' : 30}}/>
+				<ProjectList style={{float: 'left', 'width': 500, 'paddingTop' : 8}} rowHeight={ROW_HEIGHT - 3} projects={store.Projects()} issues={store.Issues} issueStatuses={store.IssueStatuses()} trackers={store.Trackers()} updateIssueWindowState={uiAction.updateIssueWindowState} deleteIssue={networkAction.deleteIssue} toggleProject={this._toggleProject}/>
+				<GanttChart height={ROW_HEIGHT} width={this.state.chartDateWidth} type={this.state.chartType} projects={store.Projects()} issues={store.Issues} users={store.Users} updateIssueDate={uiAction.updateIssueDate} updateEnd={networkAction.updateIssue} style={{overflow: 'scroll', 'paddingTop' : 30}}/>
 				<AddIssueWindow isOpen={this.state.isIssuwWindowOpen} type={this.state.modalType} relatedObj={this.state.modalObject} onClosed={this._issueWindowClosed}/>
 				<UpdateDialog isOpen={this.state.isUpdateDialogOpen}/>
 			</div>
@@ -81,8 +82,8 @@ var Main = React.createClass({
 	_onProjectsChanged : function()
 	{
 		store.Projects().some(function(project){
-			action.loadUsers(project.id);
-			action.loadIssues(project.id);
+			networkAction.loadUsers(project.id);
+			networkAction.loadIssues(project.id);
 		});
 		this._onDataChanged();
 	},
@@ -93,12 +94,12 @@ var Main = React.createClass({
 	_trackerChanged : function(event, index, value)
 	{
 		this.setState({ selectedTracker : value });
-		action.updateSelectedTracker(value);
+		uiAction.updateSelectedTracker(value);
 	},
 	_issueStatusChanged : function(event, index, value)
 	{
 		this.setState({ selectedStatus : value });
-		action.updateSelectedStatus(value);
+		uiAction.updateSelectedStatus(value);
 	},
 	_onLoadStatusChanged : function()
 	{
@@ -115,7 +116,7 @@ var Main = React.createClass({
 	},
 	_toggleProject : function(projectId)
 	{
-		action.toggelProject(projectId);
+		uiAction.toggelProject(projectId);
 	}
 });
 
