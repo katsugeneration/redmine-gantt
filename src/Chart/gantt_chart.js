@@ -19,6 +19,7 @@
 			issues : React.PropTypes.func.isRequired,
 			users : React.PropTypes.func.isRequired,
 			updateIssueDate : React.PropTypes.func,
+			updateEnd : React.PropTypes.func,
 			style : React.PropTypes.object
 		},
 		getDefaulProps : function()
@@ -28,6 +29,7 @@
 				width : 0,
 				type : 'Date',
 				updateIssueDate : () => {},
+				updateEnd : () => {},
 				style : {}
 			};
 		},
@@ -110,10 +112,14 @@
 		},
 		_onDragEnd : function()
 		{
+			var issue = this._getIndexItem(dragIndex - 2);
+
 			dragIndex = -1;
 			dragPos = 0;
 			dragType = 'None';
 			document.body.style.cursor = 'default';
+
+			this.props.updateEnd(issue.id, issue.toJSON(), issue.parent_id);
 		},
 		_onMouseMove : function(e)
 		{
