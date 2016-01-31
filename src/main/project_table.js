@@ -15,6 +15,7 @@
 	exports.ProjectList = React.createClass({
 		propTypes : {
 			style : React.PropTypes.object,
+			rowHeight : React.PropTypes.number,
 			projects : React.PropTypes.array.isRequired,
 			issues : React.PropTypes.func.isRequired,
 			issueStatuses : React.PropTypes.instanceOf(Map).isRequired,
@@ -27,6 +28,7 @@
 		{
 			return {
 				style : {},
+				rowHeight : 12,
 				projects : [],
 				issues : () => {},
 				issueStatuses : new Map(),
@@ -53,9 +55,8 @@
 
 			this.props.projects.some(function(project){
 				data.push(
-					<TableRow key={project.name} selected={row == 1} style={{heoght : 10}}>
-						<TableRowColumn>{project.name}</TableRowColumn>
-						<TableRowColumn>{project.expand ? '-' : '+'}</TableRowColumn>
+					<TableRow key={project.name} selected={row == 1} style={{height : _this.props.rowHeight}}>
+						<TableRowColumn style={{height : _this.props.rowHeight}}>{project.expand ? '-' : '+'}{project.name}</TableRowColumn>
 					</TableRow>
 				);
 				row--;
@@ -64,11 +65,12 @@
 
 				data = data.concat(_this.props.issues(project.id).map(function(issue){
 					var ret = (
-						<TableRow key={issue.id + '-' + issue.updated} selected={row == 1} >
-							<TableRowColumn>{issue.subject}</TableRowColumn>
-							<TableRowColumn>{_this.props.issueStatuses.get(issue.statusId).name}</TableRowColumn>
-							<TableRowColumn>{_this.props.trackers.get(issue.trackerId).name}</TableRowColumn>
-							<TableRowColumn>{issue.assignedUser}</TableRowColumn>
+						<TableRow key={issue.id + '-' + issue.updated} selected={row == 1} style={{height : _this.props.rowHeight}}>
+							<TableRowColumn style={{height : _this.props.rowHeight}}/>
+							<TableRowColumn style={{height : _this.props.rowHeight}}>{issue.subject}</TableRowColumn>
+							<TableRowColumn style={{height : _this.props.rowHeight}}>{_this.props.issueStatuses.get(issue.statusId).name}</TableRowColumn>
+							<TableRowColumn style={{height : _this.props.rowHeight}}>{_this.props.trackers.get(issue.trackerId).name}</TableRowColumn>
+							<TableRowColumn style={{height : _this.props.rowHeight}}>{issue.assignedUser}</TableRowColumn>
 						</TableRow>
 					);
 					row--;
@@ -82,7 +84,7 @@
 		_onCellClick : function(rowNumber, columnIndex)
 		{
 			var item = this._getRowItem(rowNumber);
-			if (item.projectId == undefined && columnIndex == 2)
+			if (item.projectId == undefined && columnIndex == 1)
 			{
 				// item is a project
 				this.props.toggleProject(item.id);
@@ -152,6 +154,10 @@
 		{
 			this._onDataChanged();
 		},
+		componentDidUpdate : function()
+		{
+			this.props.children;
+		},
 		render : function()
 		{
 			return (
@@ -159,16 +165,17 @@
 				<FlatButton onClick={this._onButtonClick} disabled={this.state.buttonType != 'Add'} label='Add' />
 				<FlatButton onClick={this._onButtonClick} disabled={this.state.buttonType != 'Update'} label='Update' />
 				<FlatButton onClick={this._onDeleteButtonClick} disabled={this.state.buttonType != 'Update'} label='Delete' />
-				<Table selectable={true} onRowSelection={this._onRowSelection} onCellClick={this._onCellClick}>
-					<TableHeader >
+				<Table onRowSelection={this._onRowSelection} onCellClick={this._onCellClick}>
+					<TableHeader displaySelectAll={false} adjustForCheckbox={false}>
 						<TableRow>
+						<TableHeaderColumn tooltip='project'>Project</TableHeaderColumn>
 						<TableHeaderColumn tooltip='subject'>Subject</TableHeaderColumn>
 						<TableHeaderColumn tooltip='status'>Status</TableHeaderColumn>
 						<TableHeaderColumn tooltip='task category'>Tracker</TableHeaderColumn>
 						<TableHeaderColumn tooltip='assigned to user'>User</TableHeaderColumn>
 						</TableRow>
 					</TableHeader>
-					<TableBody deselectOnlyClickaway={true}>
+					<TableBody deselectOnlyClickaway={true} displayRowCheckbox={false}>
 						{this.state.items}
 					</TableBody>
 				</Table>

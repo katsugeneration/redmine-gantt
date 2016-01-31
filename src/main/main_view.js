@@ -15,6 +15,8 @@ const ItemsSelectField = require('./items_select_field.js');
 const SelectField = require('material-ui').SelectField;
 const MenuItem = require('material-ui').MenuItem;
 
+const ROW_HEIGHT = 36;
+
 var Main = React.createClass({
 	getInitialState : function()
 	{
@@ -59,8 +61,8 @@ var Main = React.createClass({
 				</SelectField></div>
 				<div><ItemsSelectField items={store.Trackers()} selectedValue={this.state.selectedTracker} onValueChanged={this._trackerChanged}/>
 				<ItemsSelectField items={store.IssueStatuses()} selectedValue={this.state.selectedStatus} onValueChanged={this._issueStatusChanged}/></div>
-				<ProjectList style={{float: 'left', 'width': 500, 'paddingTop' : 8}} projects={store.Projects()} issues={store.Issues} issueStatuses={store.IssueStatuses()} trackers={store.Trackers()} updateIssueWindowState={action.updateIssueWindowState} deleteIssue={action.deleteIssue} toggleProject={this._toggleProject}/>
-				<GanttChart height={51} width={this.state.chartDateWidth} type={this.state.chartType} projects={store.Projects()} issues={store.Issues} users={store.Users} style={{overflow: 'scroll'}}/>
+				<ProjectList style={{float: 'left', 'width': 500, 'paddingTop' : 8}} rowHeight={ROW_HEIGHT - 3} projects={store.Projects()} issues={store.Issues} issueStatuses={store.IssueStatuses()} trackers={store.Trackers()} updateIssueWindowState={action.updateIssueWindowState} deleteIssue={action.deleteIssue} toggleProject={this._toggleProject}/>
+				<GanttChart height={ROW_HEIGHT} width={this.state.chartDateWidth} type={this.state.chartType} projects={store.Projects()} issues={store.Issues} users={store.Users} style={{overflow: 'scroll', 'paddingTop' : 30}}/>
 				<AddIssueWindow isOpen={this.state.isIssuwWindowOpen} type={this.state.modalType} relatedObj={this.state.modalObject} onClosed={this._issueWindowClosed}/>
 				<UpdateDialog isOpen={this.state.isUpdateDialogOpen}/>
 			</div>
@@ -68,7 +70,7 @@ var Main = React.createClass({
 	},
 	_onchartTypeChanged : function(event, index, value)
 	{
-		var width = 51;
+		var width = ROW_HEIGHT;
 		if (value == 'Week')
 		{
 			width = 10;
