@@ -243,3 +243,13 @@ exports.toggelProject = function(projectId)
 		id : projectId
 	});
 };
+
+exports.updateIssueDate = function(issueId, value, type)
+{
+	dispatcher.dispatch({
+		actionType : 'update-issue-date',
+		id : issueId,
+		value : value,
+		type : type
+	});
+};

@@ -6,6 +6,10 @@
 
 	const DEFAULT_BARCHART_COLOR = '#9e9e9e';
 
+	var dragType = 'None';
+	var dragPos = 0;
+	var dragIndex = -1;
+
 	exports.GanttChart = React.createClass({
 		propTypes : {
 			height : React.PropTypes.number.isRequired,
@@ -14,6 +18,7 @@
 			projects : React.PropTypes.array.isRequired,
 			issues : React.PropTypes.func.isRequired,
 			users : React.PropTypes.func.isRequired,
+			updateIssueDate : React.PropTypes.func,
 			style : React.PropTypes.object
 		},
 		getDefaulProps : function()
@@ -22,6 +27,7 @@
 				height : 0,
 				width : 0,
 				type : 'Date',
+				updateIssueDate : () => {},
 				style : {}
 			};
 		},
@@ -83,17 +89,83 @@
 			var barcharts = this.state.data.map(function(item, index){
 				var length = (item.dueDate == 'Invalid Date') ? 0 : new ExtendsDate(item.dueDate.getTime() - item.startDate.getTime()).getTotalDate() + 1;
 				var start = new ExtendsDate(item.startDate.getTime() - startDate.getTime()).getTotalDate();
-				return ( <BarChart key={item.key} startPos={start * this.props.width} barHeight={this.props.height} barWidth={length * this.props.width} index={index + 2} color={item.color}/> );
+				return ( <BarChart key={item.key} startPos={start * this.props.width} barHeight={this.props.height} barWidth={length * this.props.width} onDragStart={this._onDragStart} index={index + 2} color={item.color}/> );
 			}, this);
 
 			return(
 				<div style={this.props.style}>
-				<svg width={chartWidth} height={this.props.height * (this.state.data.length + 2)}>
+				<svg width={chartWidth} height={this.props.height * (this.state.data.length + 2)} onMouseMove={this._onMouseMove} onMouseUp={this._onMouseUp}>
 				<CalendarGrid {...this.props} startDate={startDate} dueDate={dueDate} length={this.state.data.length}></CalendarGrid>
 				{barcharts}
 				</svg>
 				</div>
 			);
+		},
+		_onDragStart : function(index, pos, type)
+		{
+			dragIndex = index;
+			dragPos = pos;
+			dragType = type;
+			document.body.style.cursor = type == 'Left' ? 'w-resize' : 'e-resize';
+		},
+		_onDragEnd : function()
+		{
+			dragIndex = -1;
+			dragPos = 0;
+			dragType = 'None';
+			document.body.style.cursor = 'default';
+		},
+		_onMouseMove : function(e)
+		{
+			if (dragType == 'None') return;
+
+			var diff;
+			var item = this._getIndexItem(dragIndex - 2);
+			if (dragType == 'Left')
+			{
+				diff = dragPos - e.clientX;
+				if (Math.abs(diff) < this.props.width) return;
+
+				dragPos = e.clientX;
+				this.props.updateIssueDate(item.id, Math.floor(-diff / this.props.width), 'start');
+			}
+			else if (dragType == 'Right')
+			{
+				diff = e.clientX - dragPos;
+				if (Math.abs(diff) < this.props.width) return;
+
+				dragPos = e.clientX;
+				this.props.updateIssueDate(item.id, Math.floor(diff / this.props.width), 'due');
+			}
+		},
+		_onMouseUp : function()
+		{
+			if (dragType == 'None') return;
+			this._onDragEnd();
+		},
+		_getIndexItem : function(index)
+		{
+			index++;
+			var _this = this,
+				object = undefined;
+
+			this.props.projects.some(function(project){
+				if (index == 1)
+				{
+					object = project;
+					return true;
+				}
+				index--;
+
+				if (index <= _this.props.issues(project.id).length)
+				{
+					object = _this.props.issues(project.id)[index - 1];
+					return true;
+				}
+				index -= _this.props.issues(project.id).length;
+			});
+
+			return object;
 		}
 	});
 
@@ -146,8 +218,14 @@
 			barHeight : React.PropTypes.number.isRequired,
 			barWidth : React.PropTypes.number.isRequired,
 			startPos : React.PropTypes.number.isRequired,
+			onDragStart : React.PropTypes.func.isRequired,
 			color : React.PropTypes.string,
 			index : React.PropTypes.number.isRequired
+		},
+		getInitialState: function(){
+			return {
+				edgeWidth : 3
+			};
 		},
 		getDefaulProps : function()
 		{
@@ -162,9 +240,15 @@
 		{
 			return(
 				<g transform={'translate(0,' + this.props.index * this.props.barHeight + ')'}>
-				<rect x={this.props.startPos} width={this.props.barWidth} height={this.props.barHeight} fill={this.props.color}></rect>
+					<rect x={this.props.startPos} width={this.props.barWidth} height={this.props.barHeight} fill={this.props.color}></rect>
+					<rect className='Left' x={this.props.startPos} width={this.state.edgeWidth} height={this.props.barHeight} fill={this.props.color} style={{cursor : 'w-resize'}} onMouseDown={this._onMouseDown}/>
+					<rect className='Right' x={this.props.startPos + this.props.barWidth - this.state.edgeWidth} width={this.state.edgeWidth} height={this.props.barHeight} fill={this.props.color} style={{cursor : 'e-resize'}} onMouseDown={this._onMouseDown}/>
 				</g>
 			);
+		},
+		_onMouseDown : function(e)
+		{
+			this.props.onDragStart(this.props.index, e.clientX, e.target.className.baseVal);
 		}
 	});
 

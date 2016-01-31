@@ -7,6 +7,8 @@
 	const Issue = require('../Data/issue.js').Issue;
 	const Colors = require('material-ui').Styles.Colors;
 
+	const ExtendsDate = require('../Extends/extend_date.js').ExtendsDate;
+
 	exports.__proto__ = EventEmitter.prototype;
 
 	var _loadStatus;
@@ -143,6 +145,40 @@
 		});
 
 		this.emit('issues');
+	};
+
+	exports.updateIssueDate = function(id, value, type)
+	{
+		var item = undefined;
+		for(var issues of _issues.values())
+		{
+			issues.some(function(issue){
+				if (issue.id == id)
+				{
+					item = issue;
+					return true;
+				}
+			});
+			if (item != undefined) break;
+		}
+
+
+		var satrtDate = new ExtendsDate(item.startDate);
+		var dueDate = new ExtendsDate(item.dueDate);
+		if (type == 'start')
+		{
+			satrtDate.addDate(value);
+			if (dueDate >=  satrtDate)
+				item.startDate = satrtDate.toRedmineFormatString();
+		}
+		if (type == 'due')
+		{
+			dueDate.addDate(value);
+			if (dueDate >=  satrtDate)
+				item.dueDate = dueDate.toRedmineFormatString();
+		}
+
+		exports.emit('issues');
 	};
 
 	exports.setIssueStatuses = function(data)
@@ -308,6 +344,10 @@
 
 		case 'change-project-toggle':
 			exports.changeProjectToggle(action.id);
+			break;
+
+		case 'update-issue-date':
+			exports.updateIssueDate(action.id, action.value, action.type);
 			break;
 		}
 	});
