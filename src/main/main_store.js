@@ -71,6 +71,27 @@
 		});
 	};
 
+	exports.getProject = function(projectId)
+	{
+		var ret = undefined;
+		_projects.some(function(item){
+			if(item.id == projectId)
+			{
+				ret = item;
+				return true;
+			}
+		});
+
+		return ret;
+	};
+
+	exports.changeProjectToggle = function(projectId)
+	{
+		var project = exports.getProject(projectId);
+		project.expand = !project.expand;
+		exports.emit('issues');
+	};
+
 	exports.setUsers = function(data, projectId)
 	{
 		var usersInProject = [];
@@ -204,6 +225,10 @@
 		var issues = _issues.get(projectId);
 		if (issues === undefined) return [];
 
+		// no expand project' issues are not showed
+		var project = exports.getProject(projectId);
+		if(!project.expand) return [];
+
 		var tracker = exports.Trackers().get(_selectedTracker);
 		var issueStatus = exports.IssueStatuses().get(_selectedStatus);
 		if (tracker === undefined && issueStatus === undefined) return issues;
@@ -279,6 +304,10 @@
 
 		case 'selected-status-update':
 			exports.updateSelectedStatus(action.status);
+			break;
+
+		case 'change-project-toggle':
+			exports.changeProjectToggle(action.id);
 			break;
 		}
 	});

@@ -61,8 +61,6 @@
 				);
 				row--;
 
-				if (!project.expand) return false;
-
 				data = data.concat(_this.props.issues(project.id).map(function(issue){
 					var ret = (
 						<TableRow key={issue.id + '-' + issue.updated} selected={row == 1} style={{height : _this.props.rowHeight}}>
@@ -103,9 +101,6 @@
 					return true;
 				}
 				rowNumber--;
-
-				// no expand project's issues are not showed
-				if (!project.expand) return false;
 
 				if (rowNumber <= _this.props.issues(project.id).length)
 				{

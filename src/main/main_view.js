@@ -115,14 +115,7 @@ var Main = React.createClass({
 	},
 	_toggleProject : function(projectId)
 	{
-		store.Projects().some(function(project){
-			if (project.id == projectId)
-			{
-				project.expand = !project.expand;
-				return true;
-			}
-		});
-		this._onDataChanged();
+		action.toggelProject(projectId);
 	}
 });
 

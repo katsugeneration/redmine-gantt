@@ -235,3 +235,11 @@ exports.updateSelectedStatus = function(newValue)
 		status : newValue
 	});
 };
+
+exports.toggelProject = function(projectId)
+{
+	dispatcher.dispatch({
+		actionType : 'change-project-toggle',
+		id : projectId
+	});
+};
