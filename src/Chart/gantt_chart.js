@@ -119,7 +119,7 @@
 			dragType = 'None';
 			document.body.style.cursor = 'default';
 
-			this.props.updateEnd(issue.id, issue.toJSON(), issue.parent_id);
+			this.props.updateEnd(issue.id, issue, issue.projectId);
 		},
 		_onMouseMove : function(e)
 		{

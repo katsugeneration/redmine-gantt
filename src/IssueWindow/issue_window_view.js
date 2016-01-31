@@ -71,12 +71,12 @@
 		},
 		_addNewIssue : function()
 		{
-			action.postNewIssue(this.state.issue.toJSON(), this.state.issue.projectId);
+			action.postNewIssue(this.state.issue, this.state.issue.projectId);
 			this._onClose();
 		},
 		_updateIssue : function()
 		{
-			action.updateIssue(this.props.relatedObj.id, this.state.issue.toJSON(), this.state.issue.projectId);
+			action.updateIssue(this.props.relatedObj.id, this.state.issue, this.state.issue.projectId);
 			this._onClose();
 		},
 		_onClose : function()

@@ -78,13 +78,18 @@ describe('action test', function(){
 		it('writeData response get', function(){
 			var spy = sinon.spy();
 			action.writeData('POST', 'test', 'data', function(){ spy(); });
+			response.emit('end');
 
 			assert(spy.called);
+			assert(dispatch.calledTwice);
+			assert(dispatch.calledWith({ actionType : 'data-load-finish' }));
 		});
 
 		it('writeData request error occurred', function(){
 			action.writeData('POST', 'test', 'data', function(){});
 			ret.emit('error');
+			assert(dispatch.calledTwice);
+			assert(dispatch.calledWith({ actionType : 'data-load-finish' }));
 		});
 
 		it('deleteData prestart', function(){
@@ -200,26 +205,20 @@ describe('action test', function(){
 			sinon.assert.calledWith(dispatch, sinon.match({ actionType : 'issue-window-state-update' }));
 		});
 
-		it ('post new issue after call loadIssues function', function(){
-			var loadIssue =	sinon.spy(action, 'loadIssues');
+		it ('post new issue', function(){
 			var issue = new Issue();
 			issue.parentId = 0;
 
-			action.postNewIssue({}, 0);
-			assert(loadIssue.called);
-			assert(loadIssue.calledWith(0));
-			action.loadIssues.restore();
+			action.postNewIssue(issue, 0);
+			sinon.assert.calledWith(dispatch, sinon.match({ actionType : 'add-new-issue' }));
 		});
 
-		it ('update issue after call loadIssues function', function(){
-			var loadIssue =	sinon.spy(action, 'loadIssues');
+		it ('update issue', function(){
 			var issue = new Issue();
 			issue.parentId = 0;
 
-			action.updateIssue(1, {}, 0);
-			assert(loadIssue.called);
-			assert(loadIssue.calledWith(0));
-			action.loadIssues.restore();
+			action.updateIssue(1, issue, 0);
+			sinon.assert.calledWith(dispatch, sinon.match({ actionType : 'update-issue' }));
 		});
 
 		it('update selected tracker', function(){

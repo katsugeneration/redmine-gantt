@@ -147,6 +147,27 @@
 		this.emit('issues');
 	};
 
+	exports.updateIssue = function(id, issue, projectId)
+	{
+		_issues.get(projectId).some(function(old){
+			if(id == old.id)
+			{
+				Issue.copyTo(old, issue);
+				return true;
+			}
+		});
+
+		this.emit('issues');
+	};
+
+	exports.addNewIssue = function(data, projectId)
+	{
+		var issue = Issue.toIssueFromJSON(JSON.parse(data).issue);
+		_issues.get(projectId).unshift(issue);
+
+		this.emit('issues');
+	};
+
 	exports.updateIssueDate = function(id, value, type)
 	{
 		var item = undefined;
@@ -308,6 +329,14 @@
 
 		case 'issues-gupdate':
 			exports.updateIssues(action.data, action.id);
+			break;
+
+		case 'update-issue':
+			exports.updateIssue(action.id, action.issue, action.projectId);
+			break;
+
+		case 'add-new-issue':
+			exports.addNewIssue(action.data, action.projectId);
 			break;
 
 		case 'users-get':

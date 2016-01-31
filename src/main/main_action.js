@@ -65,9 +65,10 @@ exports.deleteData = function(path, callback)
 /**
 * get Data from Redmine's specific path. If Successed, do callback.
 **/
-exports.writeData = function(method, path, data, callback)
+exports.writeData = function(method, path, issue, callback)
 {
-	var writeData = JSON.stringify(data);
+	var data = '';
+	var writeData = JSON.stringify(issue);
 	var req = protocol.request({
 		hostname : settings.host,
 		path : path,
@@ -79,13 +80,23 @@ exports.writeData = function(method, path, data, callback)
 		}
 	}, function(res){
 		res.setEncoding('utf8');
-		if (res.statusCode == 200 || res.statusCode == 201)
-			callback();
+		res.on('data', function (chunk){
+			if (res.statusCode != 200 && res.statusCode != 201) return;
+			data += chunk;
+		});
+		res.on('end', function(){
+			dispatcher.dispatch({ actionType : 'data-load-finish' });
+			if (res.statusCode != 200 && res.statusCode != 201) return;
+			callback(data);
+		});
 	});
+
+	dispatcher.dispatch({ actionType : 'data-load-start' });
 
 	req.write(writeData);
 	req.end();
 	req.on('error', function(e) {
+		dispatcher.dispatch({ actionType : 'data-load-finish' });
 		console.error(e);
 	});
 };
@@ -210,14 +221,27 @@ exports.updateIssueWindowState = function(isOpen, modalType, modalObject)
 	});
 };
 
-exports.postNewIssue = function(data, projectId)
+exports.postNewIssue = function(issue, projectId)
 {
-	exports.writeData('POST', '/issues.json', data, function(){ exports.loadIssues(projectId); } );
+	exports.writeData('POST', '/issues.json', issue.toJSON(), function(data){
+		dispatcher.dispatch({
+			actionType : 'add-new-issue',
+			data : data,
+			projectId : projectId
+		});
+	});
 };
 
-exports.updateIssue = function(issueId, data, projectId)
+exports.updateIssue = function(issueId, issue, projectId)
 {
-	exports.writeData('PUT', '/issues/' + issueId + '.json', data, function(){ exports.loadIssues(projectId); } );
+	exports.writeData('PUT', '/issues/' + issueId + '.json', issue.toJSON(), function(){
+		dispatcher.dispatch({
+			actionType : 'update-issue',
+			id : issueId,
+			issue : issue,
+			projectId : projectId
+		});
+	} );
 };
 
 exports.updateSelectedTracker = function(newValue)
