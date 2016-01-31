@@ -176,15 +176,12 @@ describe('action test', function(){
 			sinon.assert.calledWith(dispatch, sinon.match({ actionType : 'issues-update' }));
 		});
 
-		it ('delete issue after call loadIssues function', function(){
-			var loadIssue =	sinon.spy(action, 'loadIssues');
+		it ('delete issue', function(){
 			var issue = new Issue();
 			issue.parentId = 0;
 
 			action.deleteIssue(issue);
-			assert(loadIssue.called);
-			assert(loadIssue.calledWith(0));
-			action.loadIssues.restore();
+			sinon.assert.calledWith(dispatch, sinon.match({ actionType : 'delete-issue' }));
 		});
 
 		it('load issue statuses', function(){

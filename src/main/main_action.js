@@ -52,12 +52,16 @@ exports.deleteData = function(path, callback)
 		auth : settings.name + ':' + settings.password
 	}, function(res){
 		res.setEncoding('utf8');
+		dispatcher.dispatch({ actionType : 'data-load-finish' });
 		if (res.statusCode != 200) return;
 		callback();
 	});
 
+	dispatcher.dispatch({ actionType : 'data-load-start' });
+
 	req.end();
 	req.on('error', function(e) {
+		dispatcher.dispatch({ actionType : 'data-load-finish' });
 		console.error(e);
 	});
 };
@@ -179,9 +183,11 @@ exports.loadIssues =  function(id)
 
 exports.deleteIssue = function(issue)
 {
-	var _this = exports;
 	exports.deleteData('/issues/' + issue.id + '.json', function(){
-		_this.loadIssues(issue.projectId);
+		dispatcher.dispatch({
+			actionType : 'delete-issue',
+			id : issue.id
+		});
 	});
 };
 

@@ -66,7 +66,7 @@
 			_projects.some(function(item, index, array){
 				if(item.id == project.id)
 				{
-					array.pop(item);
+					array.splice(index, 1);
 					return true;
 				}
 			});
@@ -143,6 +143,25 @@
 				}
 			});
 		});
+
+		this.emit('issues');
+	};
+
+	exports.deleteIssue = function(id)
+	{
+		var item = undefined;
+		for(var issues of _issues.values())
+		{
+			issues.some(function(issue, index, array){
+				if (issue.id == id)
+				{
+					array.splice(index, 1);
+					item = issue;
+					return true;
+				}
+			});
+			if (item != undefined) break;
+		}
 
 		this.emit('issues');
 	};
@@ -329,6 +348,10 @@
 
 		case 'issues-gupdate':
 			exports.updateIssues(action.data, action.id);
+			break;
+
+		case 'delete-issue':
+			exports.deleteIssue(action.id);
 			break;
 
 		case 'update-issue':
