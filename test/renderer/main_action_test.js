@@ -122,7 +122,7 @@ describe('action test', function(){
 		var dispatch;
 		var data;
 
-		beforeEach(function(){
+		before(function(){
 			loadData = sinon.stub(networkAction, 'loadData', function(path, callback){
 				callback(data);
 			});
@@ -136,7 +136,7 @@ describe('action test', function(){
 			dispatch = sinon.spy(dispatcher, 'dispatch');
 		});
 
-		afterEach(function(){
+		after(function(){
 			loadData.restore();
 			writeData.restore();
 			deleteData.restore();

@@ -159,7 +159,14 @@
 	exports.addNewIssue = function(data, projectId)
 	{
 		var issue = Issue.toIssueFromJSON(JSON.parse(data).issue);
-		_issues.get(projectId).unshift(issue);
+		var issues = _issues.get(projectId);
+
+		if (issues == undefined)
+		{
+			issues = [];
+			_issues.set(projectId, issues);
+		}
+		issues.unshift(issue);
 
 		this.emit('issues');
 	};
