@@ -182,7 +182,7 @@ describe('action test', function(){
 			issue.parentId = 0;
 
 			networkAction.deleteIssue(issue);
-			sinon.assert.calledWith(dispatch, sinon.match({ actionType : 'delete-issue' }));
+			sinon.assert.calledWith(dispatch, sinon.match({ actionType : 'issue-delete' }));
 		});
 
 		it('load issue statuses', function(){
@@ -216,7 +216,7 @@ describe('action test', function(){
 			issue.parentId = 0;
 
 			networkAction.updateIssue(1, issue, 0);
-			sinon.assert.calledWith(dispatch, sinon.match({ actionType : 'update-issue' }));
+			sinon.assert.calledWith(dispatch, sinon.match({ actionType : 'issue-update' }));
 		});
 
 		it('update selected tracker', function(){

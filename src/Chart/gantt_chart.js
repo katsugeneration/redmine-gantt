@@ -15,9 +15,7 @@
 			height : React.PropTypes.number.isRequired,
 			width : React.PropTypes.number.isRequired,
 			type : React.PropTypes.oneOf(['Date', 'Week']).isRequired,
-			projects : React.PropTypes.array.isRequired,
-			issues : React.PropTypes.func.isRequired,
-			users : React.PropTypes.func.isRequired,
+			data : React.PropTypes.array.isRequired,
 			updateIssueDate : React.PropTypes.func,
 			updateEnd : React.PropTypes.func,
 			style : React.PropTypes.object
@@ -37,42 +35,22 @@
 		{
 			return {
 				startDate : new ExtendsDate(),
-				dueDate : new ExtendsDate(),
-				data : []
+				dueDate : new ExtendsDate()
 			};
 		},
 		componentWillReceiveProps : function(nextProps)
 		{
-			var data = []; // chart data
 			var startDate = new ExtendsDate(8640000000000000); // chart start date
 			var dueDate = new ExtendsDate(Number.MIN_VALUE); // chart end date
 
-			nextProps.projects.some(function(project){
-				// project is
-				var projectData = new GanttData();
-				projectData.startDate = new ExtendsDate(ExtendsDate.now());
-				projectData.dueDate = new ExtendsDate(undefined);
-				projectData.key = project.name;
-				data.push(projectData);
-
-				data = data.concat(nextProps.issues(project.id).map(function(issue){
-					var ganttData = new GanttData();
-					ganttData.startDate = new ExtendsDate(ExtendsDate.parse(issue.startDate));
-					ganttData.dueDate = new ExtendsDate(ExtendsDate.parse(issue.dueDate));
-					if (nextProps.users(issue.assignedId) != undefined)
-						ganttData.color = nextProps.users(issue.assignedId).color;
-					ganttData.key = issue.id + '-' + issue.updated;
-
-					// update chart date
-					if (startDate > ganttData.startDate) startDate = ganttData.startDate;
-					if (dueDate < ganttData.dueDate) dueDate = ganttData.dueDate;
-
-					return ganttData;
-				}));
+			nextProps.data.some(function(data){
+				// update chart date
+				if (data.startDate != 'Invalid Date' && startDate > data.startDate) startDate = data.startDate;
+				if (data.dueDate != 'Invalid Date' && dueDate < data.dueDate) dueDate = data.dueDate;
 			});
 
 			if (dueDate < startDate) dueDate = new ExtendsDate(undefined);
-			this.setState({startDate : startDate, dueDate : dueDate, data : data});
+			this.setState({startDate : startDate, dueDate : dueDate });
 		},
 		render : function()
 		{
@@ -88,16 +66,16 @@
 			dueDate.addDate((13 - dueDate.getDay()) % 7);
 
 			var chartWidth = (new ExtendsDate(dueDate.getTime() - startDate.getTime()).getTotalDate() + 1) * this.props.width + 5;
-			var barcharts = this.state.data.map(function(item, index){
-				var length = (item.dueDate == 'Invalid Date') ? 0 : new ExtendsDate(item.dueDate.getTime() - item.startDate.getTime()).getTotalDate() + 1;
-				var start = new ExtendsDate(item.startDate.getTime() - startDate.getTime()).getTotalDate();
-				return ( <BarChart key={item.key} startPos={start * this.props.width} barHeight={this.props.height} barWidth={length * this.props.width} onDragStart={this._onDragStart} index={index + 2} color={item.color}/> );
+			var barcharts = this.props.data.map(function(item, index){
+				var length = (item.startDate == 'Invalid Date' || item.dueDate == 'Invalid Date') ? 0 : new ExtendsDate(item.dueDate.getTime() - item.startDate.getTime()).getTotalDate() + 1;
+				var start = (item.startDate == 'Invalid Date') ? 0 : new ExtendsDate(item.startDate.getTime() - startDate.getTime()).getTotalDate();
+				return ( <BarChart key={item.key} startPos={start * this.props.width} barHeight={(start * length == 0) ? 0 : this.props.height} barWidth={length * this.props.width} onDragStart={this._onDragStart} index={index + 2} color={item.color}/> );
 			}, this);
 
 			return(
 				<div style={this.props.style}>
-				<svg width={chartWidth} height={this.props.height * (this.state.data.length + 2)} onMouseMove={this._onMouseMove} onMouseUp={this._onMouseUp}>
-				<CalendarGrid {...this.props} startDate={startDate} dueDate={dueDate} length={this.state.data.length}></CalendarGrid>
+				<svg width={chartWidth} height={this.props.height * (this.props.data.length + 2)} onMouseMove={this._onMouseMove} onMouseUp={this._onMouseUp}>
+				<CalendarGrid {...this.props} startDate={startDate} dueDate={dueDate} length={this.props.data.length}></CalendarGrid>
 				{barcharts}
 				</svg>
 				</div>
@@ -112,11 +90,14 @@
 		},
 		_onDragEnd : function()
 		{
-			var issue = this._getIndexItem(dragIndex - 2);
+			var data = this.props.data[dragIndex - 2];
+			var issue = data.obj;
 
 			dragIndex = -1;
 			dragPos = 0;
 			dragType = 'None';
+			issue.startDate = data.startDate.toRedmineFormatString();
+			issue.dueDate = data.dueDate.toRedmineFormatString();
 			document.body.style.cursor = 'default';
 
 			this.props.updateEnd(issue.id, issue, issue.projectId);
@@ -126,14 +107,14 @@
 			if (dragType == 'None') return;
 
 			var diff;
-			var item = this._getIndexItem(dragIndex - 2);
+			var item = this.props.data[dragIndex - 2];
 			if (dragType == 'Left')
 			{
 				diff = dragPos - e.clientX;
 				if (Math.abs(diff) < this.props.width) return;
 
 				dragPos = e.clientX;
-				this.props.updateIssueDate(item.id, Math.floor(-diff / this.props.width), 'start');
+				this.props.updateIssueDate(item.key, Math.floor(-diff / this.props.width), 'start');
 			}
 			else if (dragType == 'Right')
 			{
@@ -141,37 +122,13 @@
 				if (Math.abs(diff) < this.props.width) return;
 
 				dragPos = e.clientX;
-				this.props.updateIssueDate(item.id, Math.floor(diff / this.props.width), 'due');
+				this.props.updateIssueDate(item.key, Math.floor(diff / this.props.width), 'due');
 			}
 		},
 		_onMouseUp : function()
 		{
 			if (dragType == 'None') return;
 			this._onDragEnd();
-		},
-		_getIndexItem : function(index)
-		{
-			index++;
-			var _this = this,
-				object = undefined;
-
-			this.props.projects.some(function(project){
-				if (index == 1)
-				{
-					object = project;
-					return true;
-				}
-				index--;
-
-				if (index <= _this.props.issues(project.id).length)
-				{
-					object = _this.props.issues(project.id)[index - 1];
-					return true;
-				}
-				index -= _this.props.issues(project.id).length;
-			});
-
-			return object;
 		}
 	});
 
@@ -360,12 +317,4 @@
 			);
 		}
 	});
-
-	function GanttData()
-	{
-		this.key = '';
-		this.startDate = new ExtendsDate();
-		this.dueDate = new ExtendsDate();
-		this.color = DEFAULT_BARCHART_COLOR;
-	}
 })(this);

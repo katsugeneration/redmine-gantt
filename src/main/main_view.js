@@ -3,6 +3,7 @@
 const React = require('react');
 const reactDOM = require('react-dom');
 const store = require('./main_store.js');
+const uiData = require('./ui_data_store.js');
 const networkAction = require('./network_action.js');
 const uiAction = require('./ui_action.js');
 
@@ -24,7 +25,6 @@ var Main = React.createClass({
 		return{
 			chartType : 'Week',
 			chartDateWidth : 10,
-			items : [],
 			selectedTracker : -1,
 			selectedStatus : -1,
 			isIssuwWindowOpen : false,
@@ -35,21 +35,20 @@ var Main = React.createClass({
 	},
 	componentDidMount : function()
 	{
-		store.addListener('load-status', this._onLoadStatusChanged);
 		store.addListener('projects', this._onProjectsChanged);
-		store.addListener('users', this._onDataChanged);
-		store.addListener('issues', this._onDataChanged);
-		store.addListener('issue-window-state', this._onIssueWindowStateChanged);
+		uiData.addListener('view-data', this._onDataChanged);
+		uiData.addListener('load-status', this._onLoadStatusChanged);
+		uiData.addListener('issue-window-state', this._onIssueWindowStateChanged);
+		uiData.setBaseStore(store);
 		networkAction.loadIssueStatuses();
 		networkAction.loadTrackers();
 	},
 	componentWillUnmount : function()
 	{
-		store.removeListener('load-status', this._onLoadStatusChanged);
 		store.removeListener('projects', this._onProjectsChanged);
-		store.removeListener('users', this._onDataChanged);
-		store.removeListener('issues', this._onDataChanged);
-		store.removeListener('issue-window-state', this._onIssueWindowStateChanged);
+		uiData.removeListener('view-data', this._onDataChanged);
+		uiData.removeListener('load-status', this._onLoadStatusChanged);
+		uiData.removeListener('issue-window-state', this._onIssueWindowStateChanged);
 	},
 	render : function()
 	{
@@ -59,11 +58,11 @@ var Main = React.createClass({
 				<div><SelectField value={this.state.chartType} onChange={this._onchartTypeChanged} >
 					<MenuItem value='Date' primaryText='Date' />
 					<MenuItem value='Week' primaryText='Week' />
-				</SelectField></div>
-				<div><ItemsSelectField items={store.Trackers()} selectedValue={this.state.selectedTracker} onValueChanged={this._trackerChanged}/>
-				<ItemsSelectField items={store.IssueStatuses()} selectedValue={this.state.selectedStatus} onValueChanged={this._issueStatusChanged}/></div>
-				<ProjectList style={{float: 'left', 'width': 500, 'paddingTop' : 8}} rowHeight={ROW_HEIGHT - 3} projects={store.Projects()} issues={store.Issues} issueStatuses={store.IssueStatuses()} trackers={store.Trackers()} updateIssueWindowState={uiAction.updateIssueWindowState} deleteIssue={networkAction.deleteIssue} toggleProject={this._toggleProject}/>
-				<GanttChart height={ROW_HEIGHT} width={this.state.chartDateWidth} type={this.state.chartType} projects={store.Projects()} issues={store.Issues} users={store.Users} updateIssueDate={uiAction.updateIssueDate} updateEnd={networkAction.updateIssue} style={{overflow: 'scroll', 'paddingTop' : 30}}/>
+				</SelectField>
+				<ItemsSelectField items={store.IssueStatuses()} selectedValue={this.state.selectedStatus} onValueChanged={this._issueStatusChanged}/>
+				<ItemsSelectField items={store.Trackers()} selectedValue={this.state.selectedTracker} onValueChanged={this._trackerChanged}/></div>
+				<ProjectList style={{float: 'left', 'width': 500, 'paddingTop' : 8}} rowHeight={ROW_HEIGHT - 3} data={uiData.ViewData()} updateIssueWindowState={uiAction.updateIssueWindowState} deleteIssue={networkAction.deleteIssue} toggleProject={uiAction.toggelProject}/>
+				<GanttChart height={ROW_HEIGHT} width={this.state.chartDateWidth} type={this.state.chartType} data={uiData.ViewData()} updateIssueDate={uiAction.updateIssueDate} updateEnd={networkAction.updateIssue} style={{overflow: 'scroll', 'paddingTop' : 30}}/>
 				<AddIssueWindow isOpen={this.state.isIssuwWindowOpen} type={this.state.modalType} relatedObj={this.state.modalObject} onClosed={this._issueWindowClosed}/>
 				<UpdateDialog isOpen={this.state.isUpdateDialogOpen}/>
 			</div>
@@ -103,20 +102,16 @@ var Main = React.createClass({
 	},
 	_onLoadStatusChanged : function()
 	{
-		this.setState({isUpdateDialogOpen : store.LoadStatus()});
+		this.setState({isUpdateDialogOpen : uiData.LoadStatus()});
 	},
 	_onIssueWindowStateChanged : function()
 	{
-		var state = store.issueWindowState();
+		var state = uiData.issueWindowState();
 		this.setState({ isIssuwWindowOpen : state.isOpen, modalType : state.modalType, modalObject : state.modalObject });
 	},
 	_issueWindowClosed : function()
 	{
 		this.setState({ isIssuwWindowOpen : false });
-	},
-	_toggleProject : function(projectId)
-	{
-		uiAction.toggelProject(projectId);
 	}
 });
 

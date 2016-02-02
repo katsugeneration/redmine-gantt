@@ -185,7 +185,7 @@ exports.deleteIssue = function(issue)
 {
 	exports.deleteData('/issues/' + issue.id + '.json', function(){
 		dispatcher.dispatch({
-			actionType : 'delete-issue',
+			actionType : 'issue-delete',
 			id : issue.id
 		});
 	});
@@ -232,7 +232,7 @@ exports.updateIssue = function(issueId, issue, projectId)
 {
 	exports.writeData('PUT', '/issues/' + issueId + '.json', issue.toJSON(), function(){
 		dispatcher.dispatch({
-			actionType : 'update-issue',
+			actionType : 'issue-update',
 			id : issueId,
 			issue : issue,
 			projectId : projectId

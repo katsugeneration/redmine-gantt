@@ -16,10 +16,7 @@
 		propTypes : {
 			style : React.PropTypes.object,
 			rowHeight : React.PropTypes.number,
-			projects : React.PropTypes.array.isRequired,
-			issues : React.PropTypes.func.isRequired,
-			issueStatuses : React.PropTypes.instanceOf(Map).isRequired,
-			trackers : React.PropTypes.instanceOf(Map).isRequired,
+			data : React.PropTypes.array.isRequired,
 			updateIssueWindowState : React.PropTypes.func.isRequired,
 			deleteIssue : React.PropTypes.func.isRequired,
 			toggleProject : React.PropTypes.func
@@ -29,10 +26,7 @@
 			return {
 				style : {},
 				rowHeight : 12,
-				projects : [],
-				issues : () => {},
-				issueStatuses : new Map(),
-				trackers : new Map(),
+				data : [],
 				updateIssueWindowState : () => {},
 				deleteIssue : () => {},
 				toggleProject : () => {}
@@ -49,68 +43,48 @@
 		},
 		_onDataChanged : function()
 		{
-			var data = [];
+			var items = [];
 			var row = (this.state.selectedRows.length == 0) ? 0 : this.state.selectedRows[0] + 1;
 			var _this = this;
 
-			this.props.projects.some(function(project){
-				data.push(
-					<TableRow key={project.name} selected={row == 1} style={{height : _this.props.rowHeight}}>
-						<TableRowColumn style={{height : _this.props.rowHeight}}>{project.expand ? '-' : '+'}{project.name}</TableRowColumn>
-					</TableRow>
-				);
-				row--;
-
-				data = data.concat(_this.props.issues(project.id).map(function(issue){
-					var ret = (
-						<TableRow key={issue.id + '-' + issue.updated} selected={row == 1} style={{height : _this.props.rowHeight}}>
+			this.props.data.some(function(viewData){
+				if (viewData.projectName != undefined)
+				{
+					items.push(
+						<TableRow key={viewData.key} selected={row == 1} style={{height : _this.props.rowHeight}}>
+							<TableRowColumn style={{height : _this.props.rowHeight}}>{viewData.projectExpand ? '-' : '+'}{viewData.projectName}</TableRowColumn>
 							<TableRowColumn style={{height : _this.props.rowHeight}}/>
-							<TableRowColumn style={{height : _this.props.rowHeight}}>{issue.subject}</TableRowColumn>
-							<TableRowColumn style={{height : _this.props.rowHeight}}>{_this.props.issueStatuses.get(issue.statusId).name}</TableRowColumn>
-							<TableRowColumn style={{height : _this.props.rowHeight}}>{_this.props.trackers.get(issue.trackerId).name}</TableRowColumn>
-							<TableRowColumn style={{height : _this.props.rowHeight}}>{issue.assignedUser}</TableRowColumn>
+							<TableRowColumn style={{height : _this.props.rowHeight}}/>
+							<TableRowColumn style={{height : _this.props.rowHeight}}/>
+							<TableRowColumn style={{height : _this.props.rowHeight}}/>
 						</TableRow>
 					);
-					row--;
-
-					return ret;
-				}));
+				}
+				else
+				{
+					items.push(
+						<TableRow key={viewData.key} selected={row == 1} style={{height : _this.props.rowHeight}}>
+							<TableRowColumn style={{height : _this.props.rowHeight}}/>
+							<TableRowColumn style={{height : _this.props.rowHeight}}>{viewData.subject}</TableRowColumn>
+							<TableRowColumn style={{height : _this.props.rowHeight}}>{viewData.status}</TableRowColumn>
+							<TableRowColumn style={{height : _this.props.rowHeight}}>{viewData.tracker}</TableRowColumn>
+							<TableRowColumn style={{height : _this.props.rowHeight}}>{viewData.assignedUser}</TableRowColumn>
+						</TableRow>
+					);
+				}
+				row--;
 			});
 
-			this.setState({items : data});
+			this.setState({items : items});
 		},
 		_onCellClick : function(rowNumber, columnIndex)
 		{
-			var item = this._getRowItem(rowNumber);
-			if (item.projectId == undefined && columnIndex == 1)
+			var item = this.props.data[rowNumber];
+			if (item.projectName != undefined && columnIndex == 1)
 			{
 				// item is a project
 				this.props.toggleProject(item.id);
 			}
-		},
-		_getRowItem : function(rowNumber)
-		{
-			rowNumber++;
-			var _this = this,
-				object = undefined;
-
-			this.props.projects.some(function(project){
-				if (rowNumber == 1)
-				{
-					object = project;
-					return true;
-				}
-				rowNumber--;
-
-				if (rowNumber <= _this.props.issues(project.id).length)
-				{
-					object = _this.props.issues(project.id)[rowNumber - 1];
-					return true;
-				}
-				rowNumber -= _this.props.issues(project.id).length;
-			});
-
-			return object;
 		},
 		_onRowSelection : function(selectedRows)
 		{
@@ -128,13 +102,18 @@
 
 			var row = selectedRows[0];
 			var type = 'Add';
-			var object = this._getRowItem(row);
-			if (object.projectId != undefined) type = 'Update';
+			var object = this.props.data[row];
+			if (object.projectName == undefined)
+				type = 'Update';
+			object = object.obj;
 
-			this.state.buttonType = type;
-			this.state.buttonRelatedObject = object;
-			this.state.selectedRows = selectedRows;
-			this._onDataChanged();
+			// wait event end
+			setTimeout(function(self){
+				self.state.buttonType = type;
+				self.state.buttonRelatedObject = object;
+				self.state.selectedRows = selectedRows;
+				self._onDataChanged();
+			},100, this);
 			return;
 		},
 		_onButtonClick : function()
@@ -147,7 +126,10 @@
 		},
 		componentWillReceiveProps : function()
 		{
-			this._onDataChanged();
+			// wait event end
+			setTimeout(function(self){
+				self._onDataChanged();
+			},100, this);
 		},
 		componentDidUpdate : function()
 		{

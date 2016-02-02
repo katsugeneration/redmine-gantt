@@ -112,6 +112,7 @@
 		_assignedIdChanged : function(e, index, value)
 		{
 			this.state.issue.assignedId = value;
+			this.state.issue.assignedUser = store.User(value).name;
 			this.forceUpdate();
 		},
 		_formatDate : function(date)
@@ -132,7 +133,7 @@
 
 			var userList = [];
 			userList.push( <MenuItem key={-1} value={-1} primaryText='No Assigned' /> );
-			store.GetProjectUsers(this.state.issue.projectId).some(function(user){
+			store.getProjectUsers(this.state.issue.projectId).some(function(user){
 				userList.push( <MenuItem key={user.id} value={user.id} primaryText={user.name} /> );
 			});
 

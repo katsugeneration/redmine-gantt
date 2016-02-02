@@ -54,7 +54,7 @@ describe('project setting', function() {
 			data = '{"memberships" : [{"user" : {"id" : 1, "name" : "test"}}]}';
 
 		beforeEach(function(){
-			users = sinon.stub(store, 'Users', function(){
+			users = sinon.stub(store, 'User', function(){
 				return user;
 			});
 		});
@@ -68,7 +68,7 @@ describe('project setting', function() {
 			store.setUsers(data, 1);
 			users.restore();
 
-			assert.equal(store.Users(1).name, 'test');
+			assert.equal(store.User(1).name, 'test');
 		});
 
 		it('set users when user contained in user list', function(){
@@ -76,7 +76,7 @@ describe('project setting', function() {
 			store.setUsers(data, 1);
 			users.restore();
 
-			assert.equal(store.Users(1), user);
+			assert.equal(store.User(1), user);
 		});
 	});
 
@@ -90,14 +90,14 @@ describe('project setting', function() {
 		it('issues contained in the project', function(){
 			store.setIssues(data, 1);
 
-			assert.equal(store.Issues(1).length, 1);
-			assert.equal(store.Issues(1)[0].id, 1);
+			assert.equal(store.getProjectIssues(1).length, 1);
+			assert.equal(store.getProjectIssues(1)[0].id, 1);
 		});
 
 		it('issues not contained in the project', function(){
 			store.setIssues(data, 2);
 
-			assert.equal(store.Issues(1).length, 0);
+			assert.equal(store.getProjectIssues(1).length, 0);
 		});
 	});
 
@@ -115,14 +115,14 @@ describe('project setting', function() {
 		it('issues contained in the project', function(){
 			store.updateIssues(data, 1);
 
-			assert.equal(store.Issues(1).length, 1);
-			assert.equal(store.Issues(1)[0].subject, 'test2');
+			assert.equal(store.getProjectIssues(1).length, 1);
+			assert.equal(store.getProjectIssues(1)[0].subject, 'test2');
 		});
 
 		it('issues not contained in the project', function(){
 			store.setIssues(data, 2);
 
-			assert.equal(store.Issues(1).length, 1);
+			assert.equal(store.getProjectIssues(1).length, 1);
 		});
 	});
 
@@ -136,11 +136,11 @@ describe('project setting', function() {
 		});
 
 		it('users containd', function(){
-			assert.equal(store.Users(1).name, 'test');
+			assert.equal(store.User(1).name, 'test');
 		});
 
 		it('users not containd', function(){
-			assert.equal(store.Users(2), undefined);
+			assert.equal(store.User(2), undefined);
 		});
 	});
 
@@ -150,34 +150,13 @@ describe('project setting', function() {
 		});
 
 		it('project not contains issues', function(){
-			assert.equal(store.Issues(1).length, 0);
+			assert.equal(store.getProjectIssues(1).length, 0);
 		});
 
 		it('project contains issues', function(){
 			store.setIssues('{ "issues" : [{ "id" : 1, "subject" : "test", "project" : { "id" : 1}, "tracker" : {}, "status" : {}}]}', 1);
-			assert.equal(store.Issues(1).length, 1);
-			assert.equal(store.Issues(1)[0].subject, 'test');
-		});
-
-		it('project contains issues with filter', function(){
-			var map = new Map();
-			map.set(1, 1);
-			store.setIssues('{ "issues" : [{ "id" : 1, "subject" : "test", "project" : { "id" : 1}, "tracker" : { "id" : 1}, "status" : { "id" : 1}}, { "id" : 2, "subject" : "test2", "project" : { "id" : 1}, "tracker" : { "id" : 2}, "status" : { "id" : 2}}]}', 1);
-			var trackers = sinon.stub(store, 'Trackers', function(){
-				return map;
-			});
-			var statuses = sinon.stub(store, 'IssueStatuses', function(){
-				return map;
-			});
-
-			store.updateSelectedTracker(1);
-			store.updateSelectedStatus(1);
-
-			assert.equal(store.Issues(1).length, 1);
-			assert.equal(store.Issues(1)[0].subject, 'test');
-
-			trackers.restore();
-			statuses.restore();
+			assert.equal(store.getProjectIssues(1).length, 1);
+			assert.equal(store.getProjectIssues(1)[0].subject, 'test');
 		});
 	});
 });

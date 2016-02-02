@@ -38,11 +38,11 @@ exports.toggelProject = function(projectId)
 	});
 };
 
-exports.updateIssueDate = function(issueId, value, type)
+exports.updateIssueDate = function(issueKey, value, type)
 {
 	dispatcher.dispatch({
 		actionType : 'update-issue-date',
-		id : issueId,
+		key : issueKey,
 		value : value,
 		type : type
 	});
