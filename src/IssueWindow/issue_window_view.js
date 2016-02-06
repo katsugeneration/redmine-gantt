@@ -3,8 +3,6 @@
 
 	const React = require('react');
 	const Modal = require('react-modal');
-	const action = require('../main/network_action.js');
-	const store = require('../main/main_store.js');
 	const Issue = require('../Data/issue.js').Issue;
 	const ExtendsDate = require('../Extends/extend_date.js').ExtendsDate;
 
@@ -16,10 +14,14 @@
 
 	exports.AddIssueWindow = React.createClass({
 		propTypes : {
+			store : React.PropTypes.obj,
 			isOpen : React.PropTypes.bool,
 			type : React.PropTypes.oneOf(['Add', 'Update']).isRequired,
 			relatedObj : React.PropTypes.any.isRequired,
-			onClosed : React.PropTypes.func
+			onClosed : React.PropTypes.func.isRequired,
+			addNewIssue : React.PropTypes.func.isRequired,
+			updateIssue : React.PropTypes.func.isRequired
+
 		},
 		getDefaulProps : function()
 		{
@@ -69,20 +71,17 @@
 				mainButtonCallback : mainButtonCallback
 			});
 		},
+		_onClose : function()
+		{
+			this.props.onClosed();
+		},
 		_addNewIssue : function()
 		{
-			action.postNewIssue(this.state.issue, this.state.issue.projectId);
-			this._onClose();
+			this.props.addNewIssue(this.state.issue, this.state.issue.projectId);
 		},
 		_updateIssue : function()
 		{
-			action.updateIssue(this.props.relatedObj.id, this.state.issue, this.state.issue.projectId);
-			this._onClose();
-		},
-		_onClose : function()
-		{
-			this.setState({isOpen : false});
-			this.props.onClosed();
+			this.props.updateIssue(this.state.issue.id, this.state.issue, this.state.issue.projectId);
 		},
 		_startDateChanged : function(e, date)
 		{
@@ -112,7 +111,7 @@
 		_assignedIdChanged : function(e, index, value)
 		{
 			this.state.issue.assignedId = value;
-			this.state.issue.assignedUser = store.User(value).name;
+			this.state.issue.assignedUser = this.props.store.User(value).name;
 			this.forceUpdate();
 		},
 		_formatDate : function(date)
@@ -122,18 +121,18 @@
 		render :function()
 		{
 			var trackerList = [];
-			store.Trackers().forEach(function(value, key){
+			this.props.store.Trackers().forEach(function(value, key){
 				trackerList.push( <MenuItem key={key} value={key} primaryText={value.name} /> );
 			});
 
 			var statusList = [];
-			store.IssueStatuses().forEach(function(value, key){
+			this.props.store.IssueStatuses().forEach(function(value, key){
 				statusList.push( <MenuItem key={key} value={key} primaryText={value.name} /> );
 			});
 
 			var userList = [];
 			userList.push( <MenuItem key={-1} value={-1} primaryText='No Assigned' /> );
-			store.getProjectUsers(this.state.issue.projectId).some(function(user){
+			this.props.store.getProjectUsers(this.state.issue.projectId).some(function(user){
 				userList.push( <MenuItem key={user.id} value={user.id} primaryText={user.name} /> );
 			});
 

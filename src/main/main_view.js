@@ -63,7 +63,7 @@ var Main = React.createClass({
 				<ItemsSelectField items={store.Trackers()} selectedValue={this.state.selectedTracker} onValueChanged={this._trackerChanged}/></div>
 				<ProjectList style={{float: 'left', 'width': 500, 'paddingTop' : 8}} rowHeight={ROW_HEIGHT - 3} data={uiData.ViewData()} updateIssueWindowState={uiAction.updateIssueWindowState} deleteIssue={networkAction.deleteIssue} toggleProject={uiAction.toggelProject}/>
 				<GanttChart height={ROW_HEIGHT} width={this.state.chartDateWidth} type={this.state.chartType} data={uiData.ViewData()} updateIssueDate={uiAction.updateIssueDate} updateEnd={networkAction.updateIssue} style={{overflow: 'scroll', 'paddingTop' : 30}}/>
-				<AddIssueWindow isOpen={this.state.isIssuwWindowOpen} type={this.state.modalType} relatedObj={this.state.modalObject} onClosed={this._issueWindowClosed}/>
+				<AddIssueWindow store={store} isOpen={this.state.isIssuwWindowOpen} type={this.state.modalType} relatedObj={this.state.modalObject} onClosed={this._issueWindowClosed} addNewIssue={this._addNewIssue} updateIssue={this._updateIssue}/>
 				<UpdateDialog isOpen={this.state.isUpdateDialogOpen}/>
 			</div>
 		);
@@ -112,6 +112,16 @@ var Main = React.createClass({
 	_issueWindowClosed : function()
 	{
 		this.setState({ isIssuwWindowOpen : false });
+	},
+	_addNewIssue : function(issue, projectId)
+	{
+		this.setState({ isIssuwWindowOpen : false });
+		networkAction.postNewIssue(issue, projectId);
+	},
+	_updateIssue : function(issueId, issue, projectId)
+	{
+		this.setState({ isIssuwWindowOpen : false });
+		networkAction.updateIssue(issueId, issue, projectId);
 	}
 });
 
